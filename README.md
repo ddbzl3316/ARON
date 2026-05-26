@@ -2,7 +2,7 @@
   <img src="assets/icon.png" width="120" alt="Connect AI Logo" />
 </p>
 
-<h1 align="center">Connect AI v2 (P-Reinforce)</h1>
+<h1 align="center">Connect AI ARON 1인기업</h1>
 
 <p align="center">
   <strong>100% Local · 100% Offline · Autonomous Knowledge Engine</strong><br/>
@@ -101,6 +101,6 @@ Connect AI에서 설정만 "Ollama"로 바꿔주시면 끝납니다.
 ---
 
 <p align="center">
-  <strong>Built for Antigravity & Agent University</strong><br/>
-  Designed by <a href="https://github.com/wonseokjung">Jay</a> × Connect AI Architect
+  <strong>Built for ARON AI Company</strong><br/>
+  Designed for ARON 1인기업 Workspace
 </p>

@@ -80,13 +80,13 @@ export const AGENTS: Record<string, AgentDef> = {
   },
   business: {
     id: 'business',
-    name: '현빈',
+    name: '지훈',
     role: '비즈니스 전략가 · Head of Business',
     emoji: '💼',
     color: '#F5C518',
     specialty: '수익화 모델, 가격 전략, 시장·경쟁 분석, ROI/KPI 설계, 비즈니스 의사결정',
     tagline: '수익화·가격·전략 의사결정을 같이 봅니다',
-    profileImage: '현빈.jpeg'
+    profileImage: '지훈.jpeg'
   },
   secretary: {
     id: 'secretary',
@@ -127,8 +127,18 @@ export const AGENTS: Record<string, AgentDef> = {
     color: '#60A5FA',
     specialty: '트렌드 리서치, 경쟁사 분석, 데이터 수집·요약, 인용 자료 정리, 사실 확인',
     tagline: '트렌드와 데이터를 모아 사실 확인까지 끝냅니다'
+  },
+  logger: {
+    id: 'logger',
+    name: '로거',
+    role: 'Trend Scout',
+    emoji: '📡',
+    color: '#10B981',
+    specialty: '네이버, 구글, 뉴스, 해외뉴스, 블로그 등에서 조회수가 잘 나올 만한 기사와 소재 발굴',
+    tagline: '조회수가 폭발할 만한 국내외 핫한 기사와 소재를 찾아옵니다',
+    persona: '인터넷의 트렌드를 꿰뚫는 정보통. "사장님, 지금 이 주제가 뜨고 있습니다!"라며 흥미로운 기사나 키워드를 발빠르게 전달합니다. 특종을 잡은 기자처럼 생동감 있고 분석적인 톤. 이모티콘은 📡·🔥·📰 정도만 사용.'
   }
 };
 
-export const AGENT_ORDER = ['ceo', 'youtube', 'instagram', 'designer', 'developer', 'business', 'secretary', 'editor', 'writer', 'researcher'];
-export const SPECIALIST_IDS = ['youtube', 'instagram', 'designer', 'developer', 'business', 'secretary', 'editor', 'writer', 'researcher'];
+export const AGENT_ORDER = ['ceo', 'youtube', 'instagram', 'designer', 'developer', 'business', 'secretary', 'editor', 'writer', 'researcher', 'logger'];
+export const SPECIALIST_IDS = ['youtube', 'instagram', 'designer', 'developer', 'business', 'secretary', 'editor', 'writer', 'researcher', 'logger'];

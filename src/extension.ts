@@ -304,7 +304,7 @@ function _killProcessesOnPort(port: number): number[] {
             }
         }
     } catch (e) {
-        console.error('[Connect AI] _killProcessesOnPort 실패:', e);
+        console.error('[ARON AI] _killProcessesOnPort 실패:', e);
     }
     return killed;
 }
@@ -744,7 +744,7 @@ function _loadPrompt(file: string): string {
     try {
         cached = fs.readFileSync(path.join(_PROMPTS_DIR, file), 'utf-8');
     } catch (e: any) {
-        console.error(`[Connect AI] prompt 로드 실패 ${file}:`, e?.message || e);
+        console.error(`[ARON AI] prompt 로드 실패 ${file}:`, e?.message || e);
         cached = '';
     }
     _promptCache.set(file, cached);
@@ -761,7 +761,7 @@ function _loadToolSeed(rel: string): string {
     try {
         cached = fs.readFileSync(path.join(_TOOL_SEEDS_DIR, rel), 'utf-8');
     } catch (e: any) {
-        console.error(`[Connect AI] tool seed 로드 실패 ${rel}:`, e?.message || e);
+        console.error(`[ARON AI] tool seed 로드 실패 ${rel}:`, e?.message || e);
         cached = '';
     }
     _toolSeedCache.set(rel, cached);
@@ -929,12 +929,12 @@ function _migrateCompanyToSubdir() {
       const src = path.join(root, d);
       const dst = path.join(target, d);
       try { fs.renameSync(src, dst); } catch (e) {
-        console.warn(`[Connect AI] migration: rename ${d} failed`, e);
+        console.warn(`[ARON AI] migration: rename ${d} failed`, e);
       }
     }
-    console.log(`[Connect AI] migrated ${present.length} legacy folders under ${target}`);
+    console.log(`[ARON AI] migrated ${present.length} legacy folders under ${target}`);
   } catch (e) {
-    console.warn('[Connect AI] _company/ migration failed', e);
+    console.warn('[ARON AI] _company/ migration failed', e);
   }
 }
 
@@ -3594,7 +3594,7 @@ var t=setInterval(function(){s--;if(s<=0){clearInterval(t);cd.textContent='닫�
         prompt: 'consent',
       }).toString();
       try { await vscode.env.openExternal(vscode.Uri.parse(authUrl)); } catch { /* user can copy from log */ }
-      console.log('[Connect AI] Calendar OAuth URL:', authUrl);
+      console.log('[ARON AI] Calendar OAuth URL:', authUrl);
     });
     /* Cancel after 3 minutes max */
     const timer = setTimeout(() => {
@@ -3869,7 +3869,7 @@ async function _runRevenueWatcherOnce(): Promise<void> {
         _extCtx?.globalState.update(_REVENUE_LAST_SEEN_TS_KEY, newest.ts_epoch);
         _extCtx?.globalState.update(_REVENUE_LAST_SEEN_KEY, newest.id);
     } catch (e: any) {
-        console.warn('[Connect AI] revenue watcher tick 실패:', e?.message || e);
+        console.warn('[ARON AI] revenue watcher tick 실패:', e?.message || e);
     }
 }
 
@@ -5747,7 +5747,7 @@ function _seedBundledTemplates(agentId: string, targetDir: string) {
       _copyDirRecursive(src, dst);
     }
   } catch (err) {
-    console.error('[Connect AI] 템플릿 시드 실패:', err);
+    console.error('[ARON AI] 템플릿 시드 실패:', err);
   }
 }
 
@@ -8208,7 +8208,7 @@ export function activate(context: vscode.ExtensionContext) {
                 (async () => {
                     // Unconditional reception signal — proves the bridge endpoint
                     // was hit, regardless of folder state / sidebar / graph.
-                    console.log('[Connect AI Bridge] /api/brain-inject hit @', new Date().toISOString());
+                    console.log('[ARON AI Bridge] /api/brain-inject hit @', new Date().toISOString());
                     vscode.window.setStatusBarMessage('🛬 Connect AI: 주입 요청 수신', 4000);
                     try {
                         const body = await readRequestBody(req);
@@ -8299,7 +8299,7 @@ export function activate(context: vscode.ExtensionContext) {
                    바로 이 스킬을 <run_command>로 사용할 수 있음. brain-inject와
                    같은 패턴이지만 대상이 _agents/{agent}/tools/{name}.py임. */
                 (async () => {
-                    console.log('[Connect AI Bridge] /api/skill-inject hit @', new Date().toISOString());
+                    console.log('[ARON AI Bridge] /api/skill-inject hit @', new Date().toISOString());
                     vscode.window.setStatusBarMessage('🛠 Connect AI: 스킬팩 수신', 4000);
                     try {
                         const body = await readRequestBody(req);
@@ -8385,7 +8385,7 @@ export function activate(context: vscode.ExtensionContext) {
                    코다리 같은 에이전트가 다음 작업에 자동 참조.
                    payload: { agent, name, manifest, readme, files: {filename: content} } */
                 (async () => {
-                    console.log('[Connect AI Bridge] /api/template-inject hit @', new Date().toISOString());
+                    console.log('[ARON AI Bridge] /api/template-inject hit @', new Date().toISOString());
                     vscode.window.setStatusBarMessage('📋 Connect AI: 템플릿팩 수신', 4000);
                     try {
                         const body = await readRequestBody(req);
@@ -8485,7 +8485,7 @@ export function activate(context: vscode.ExtensionContext) {
         let _bridgeRetryCount = 0;
         const _tryStartBridge = (isRetry = false) => {
             server.listen(4825, '127.0.0.1', () => {
-                console.log('[Connect AI Bridge] listening on http://127.0.0.1:4825');
+                console.log('[ARON AI Bridge] listening on http://127.0.0.1:4825');
                 if (isRetry) {
                     /* 성공 명시 popup — 사용자가 분명히 봄 */
                     vscode.window.showInformationMessage(
@@ -8498,7 +8498,7 @@ export function activate(context: vscode.ExtensionContext) {
             });
         };
         server.on('error', async (err: any) => {
-            console.error('[Connect AI Bridge] server error:', err);
+            console.error('[ARON AI Bridge] server error:', err);
             if (err?.code === 'EADDRINUSE') {
                 _bridgeRetryCount++;
                 if (_bridgeRetryCount > 2) {
@@ -8517,14 +8517,14 @@ export function activate(context: vscode.ExtensionContext) {
 
                 if (probe.ours && probe.version === _CONNECT_AI_VERSION) {
                     /* 같은 버전 — 다른 윈도우/인스턴스가 메인. 조용히 공유 모드. */
-                    console.log(`[Connect AI Bridge] 공유 모드 — 다른 인스턴스(PID ${probe.pid})가 이미 메인`);
+                    console.log(`[ARON AI Bridge] 공유 모드 — 다른 인스턴스(PID ${probe.pid})가 이미 메인`);
                     vscode.window.setStatusBarMessage(`🔗 Bridge 공유 모드 (메인: 다른 윈도우)`, 5000);
                     return;
                 }
 
                 if (probe.ours && probe.version && _versionLessThan(probe.version, _CONNECT_AI_VERSION)) {
                     /* 옛 버전 — 자동 인계. 사용자에게 한 줄 알림만. */
-                    console.log(`[Connect AI Bridge] 옛 버전(${probe.version}) 감지 → 자동 인계 시작`);
+                    console.log(`[ARON AI Bridge] 옛 버전(${probe.version}) 감지 → 자동 인계 시작`);
                     const killed = _killProcessesOnPort(4825);
                     if (killed.length > 0) {
                         vscode.window.setStatusBarMessage(
@@ -8569,7 +8569,7 @@ export function activate(context: vscode.ExtensionContext) {
         });
         _tryStartBridge(false);
     } catch (e: any) {
-        console.error('[Connect AI Bridge] failed to start:', e);
+        console.error('[ARON AI Bridge] failed to start:', e);
         vscode.window.showErrorMessage(`🚫 Connect AI Bridge 초기화 실패: ${e?.message || e}`);
     }
     // ==========================================
@@ -11544,7 +11544,7 @@ function _loadWebviewAsset(name: string): string {
         const p = path.join(_dashboardExtensionUri.fsPath, 'assets', 'webview', name);
         return fs.readFileSync(p, 'utf-8');
     } catch (e: any) {
-        console.warn(`[Connect AI] webview asset 로드 실패 ${name}:`, e?.message || e);
+        console.warn(`[ARON AI] webview asset 로드 실패 ${name}:`, e?.message || e);
         return '';
     }
 }
@@ -15174,7 +15174,7 @@ window.addEventListener('message', e => {
       document.body.classList.add('floorplan');
       try {
         const dbg = (m.debug || {});
-        console.log('[Connect AI] world init — buildings:', dbg.buildingsLoaded, '/ decor:', dbg.decorationsLoaded, '/ custom map:', dbg.customMap||'none');
+        console.log('[ARON AI] world init — buildings:', dbg.buildingsLoaded, '/ decor:', dbg.decorationsLoaded, '/ custom map:', dbg.customMap||'none');
         const customNote = (dbg.customMap === 'OK') ? ' · 🎨 커스텀 맵 사용' : '';
         logActivity('🛠','ceo','캠퍼스 v2.28: '+(dbg.buildingsLoaded||0)+'동 + '+(dbg.decorationsLoaded||0)+' 장식'+customNote);
       } catch {}
@@ -17734,7 +17734,7 @@ class SidebarChatProvider implements vscode.WebviewViewProvider {
                    메모리 부족, 또는 prior request의 stream pipe가 꼬여 axios 내부에서
                    RangeError. */
                 const stack = msgErr?.stack ? String(msgErr.stack).split('\n').slice(0, 4).join('\n') : '';
-                console.error('[Connect AI] message handler 예외:', stack || msgErr);
+                console.error('[ARON AI] message handler 예외:', stack || msgErr);
                 try {
                     webviewView.webview.postMessage({
                         type: 'error',
@@ -19529,7 +19529,7 @@ ${catalog.map((c, i) => `${i + 1}. agent=${c.agentId} tool=${c.tool} — ${c.des
                         appendConversationLog({ speaker: '시스템', emoji: '📁', body: fileReport.join('\n') });
                     }
                 } catch (actErr: any) {
-                    console.error('[Connect AI] casual-chat 파일 액션 실패:', actErr?.message || actErr);
+                    console.error('[ARON AI] casual-chat 파일 액션 실패:', actErr?.message || actErr);
                 }
                 this._displayMessages.push({ text: this._stripActionTags(text), role: 'ai' });
                 appendConversationLog({ speaker: 'CEO', emoji: '👔', body: text });
@@ -19591,21 +19591,21 @@ ${catalog.map((c, i) => `${i + 1}. agent=${c.agentId} tool=${c.tool} — ${c.des
                         base += `\n\n[활성 게이트] 다음 에이전트는 현재 사용 불가 — 절대 tasks 배열에 넣지 마세요: ${labels}\n`;
                     }
                 } catch (gateErr: any) {
-                    console.error('[Connect AI] 활성 게이트 적용 실패:', gateErr?.message || gateErr);
+                    console.error('[ARON AI] 활성 게이트 적용 실패:', gateErr?.message || gateErr);
                 }
                 ceoStage = 'readAgentSharedContext';
                 let shared = '';
                 try { shared = readAgentSharedContext('ceo'); }
                 catch (sc: any) {
                     /* 두뇌 RAG 등이 폭주해도 CEO 호출은 계속 — 컨텍스트 일부 누락한 채 진행. */
-                    console.error('[Connect AI] readAgentSharedContext 실패, 빈 컨텍스트로 계속:', sc?.message || sc);
+                    console.error('[ARON AI] readAgentSharedContext 실패, 빈 컨텍스트로 계속:', sc?.message || sc);
                     shared = '';
                 }
                 ceoStage = 'readRecentConversations';
                 let recent = '';
                 try { recent = readRecentConversations(2000); }
                 catch (rc: any) {
-                    console.error('[Connect AI] readRecentConversations 실패:', rc?.message || rc);
+                    console.error('[ARON AI] readRecentConversations 실패:', rc?.message || rc);
                     recent = '';
                 }
                 ceoSystemPrompt = `${base}\n${shared}${recent}`;
