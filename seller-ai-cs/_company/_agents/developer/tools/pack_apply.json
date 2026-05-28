@@ -1,0 +1,44 @@
+{
+  "KIT_NAME": "",
+  "USER_INTENT": "",
+  "PROJECT_PATH": "",
+  "_schema": {
+    "KIT_NAME": {
+      "type": "select",
+      "label": "🧩 키트 (명시 선택, 선택 사항)",
+      "hint": "비우면 USER_INTENT 로 자동 추론. 명시하면 무조건 그 키트 사용.",
+      "options": [
+        {
+          "value": "",
+          "label": "(자동 추론 — USER_INTENT 사용)"
+        },
+        {
+          "value": "landing-kit",
+          "label": "🏠 Landing Kit — SaaS 랜딩 (6 섹션)"
+        },
+        {
+          "value": "portfolio-kit",
+          "label": "👤 Portfolio Kit — 1인 크리에이터 (5 섹션)"
+        },
+        {
+          "value": "dashboard-kit",
+          "label": "📊 Dashboard Kit — SaaS 관리자"
+        },
+        {
+          "value": "mobile-kit",
+          "label": "📱 Mobile Kit — Expo 모바일 앱 (3 화면)"
+        }
+      ]
+    },
+    "USER_INTENT": {
+      "type": "text",
+      "label": "🎯 사용자 의도 (자연어, 자동 매칭용)",
+      "hint": "예: \"다이어트 SaaS 랜딩\" → 자동으로 landing-kit. \"내 작품 모음\" → portfolio-kit."
+    },
+    "PROJECT_PATH": {
+      "type": "text",
+      "label": "📁 적용할 프로젝트 경로",
+      "hint": "비우면 web_init 이 마지막에 만든 프로젝트 자동 사용"
+    }
+  }
+}

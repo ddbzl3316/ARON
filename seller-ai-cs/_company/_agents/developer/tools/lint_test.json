@@ -1,0 +1,25 @@
+{
+  "PROJECT_PATH": "",
+  "STRICT": "false",
+  "_schema": {
+    "PROJECT_PATH": {
+      "type": "text",
+      "label": "📁 프로젝트 경로",
+      "hint": "비우면 web_init 마지막 결과 사용"
+    },
+    "STRICT": {
+      "type": "select",
+      "label": "⚙️ 엄격 모드",
+      "options": [
+        {
+          "value": "false",
+          "label": "느슨 — 모든 검증 시도 (기본)"
+        },
+        {
+          "value": "true",
+          "label": "엄격 — 첫 실패 시 중단"
+        }
+      ]
+    }
+  }
+}

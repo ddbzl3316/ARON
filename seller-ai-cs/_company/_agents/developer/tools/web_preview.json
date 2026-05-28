@@ -1,0 +1,31 @@
+{
+  "PROJECT_PATH": "",
+  "DEV_CMD": "",
+  "AUTO_OPEN": "true",
+  "_schema": {
+    "PROJECT_PATH": {
+      "type": "text",
+      "label": "📁 프로젝트 경로",
+      "hint": "비우면 web_init이 마지막에 만든 프로젝트 자동 사용"
+    },
+    "DEV_CMD": {
+      "type": "text",
+      "label": "▶️ dev 명령",
+      "hint": "비우면 package.json scripts.dev 자동 감지 (npm run dev)"
+    },
+    "AUTO_OPEN": {
+      "type": "select",
+      "label": "🌐 브라우저 자동 열기",
+      "options": [
+        {
+          "value": "true",
+          "label": "O — URL 감지하면 브라우저 자동 오픈"
+        },
+        {
+          "value": "false",
+          "label": "X — 출력만, 브라우저 수동"
+        }
+      ]
+    }
+  }
+}

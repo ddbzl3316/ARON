@@ -1,0 +1,40 @@
+{
+  "PROJECT_PATH": "",
+  "APP_NAME": "",
+  "APP_SHORT_NAME": "",
+  "THEME_COLOR": "#667eea",
+  "BACKGROUND_COLOR": "#ffffff",
+  "ICON_EMOJI": "✦",
+  "_schema": {
+    "PROJECT_PATH": {
+      "type": "text",
+      "label": "📁 프로젝트 경로",
+      "hint": "비우면 web_init 결과 자동 사용"
+    },
+    "APP_NAME": {
+      "type": "text",
+      "label": "📱 앱 이름",
+      "hint": "홈 화면에 표시될 풀 이름. 비우면 폴더명."
+    },
+    "APP_SHORT_NAME": {
+      "type": "text",
+      "label": "🏷️ 짧은 이름",
+      "hint": "12자 이하. 비우면 앱 이름 잘라서."
+    },
+    "THEME_COLOR": {
+      "type": "text",
+      "label": "🎨 테마 색",
+      "hint": "상단 바 색. #RRGGBB"
+    },
+    "BACKGROUND_COLOR": {
+      "type": "text",
+      "label": "🖼️ 스플래시 배경",
+      "hint": "앱 시작 화면 배경. #RRGGBB"
+    },
+    "ICON_EMOJI": {
+      "type": "text",
+      "label": "✨ 아이콘 이모지",
+      "hint": "아이콘에 쓸 이모지 (예: 📚 ✦ 🎯)"
+    }
+  }
+}
