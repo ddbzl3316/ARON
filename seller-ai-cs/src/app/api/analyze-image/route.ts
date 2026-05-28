@@ -4,7 +4,7 @@ import sharp from 'sharp';
 
 const SYSTEM_PROMPT = `
 당신은 온라인 커머스 상세페이지 이미지 분석 전문가이자 초정밀 Vision OCR 모델입니다.
-주어진 이미지를 픽셀 단위로 정밀하게 분석하여 아래 4대 핵심 CS 항목을 추출해주세요.
+주어진 이미지를 픽셀 단위로 정밀하게 분석하여 아래 6대 핵심 CS 항목을 추출해주세요.
 
 [초정밀 분석 대상 및 작성 규칙]
 1. 이미지에서 확인된 옵션별 사이즈:
@@ -13,7 +13,6 @@ const SYSTEM_PROMPT = `
    - 표나 텍스트에 규격이 여러 개 존재한다면, 절대 대표값 하나로 요약하거나 생략하지 말고 모든 행을 개별적으로 읽어와 빠짐없이 목록화하십시오.
    - "소형/1인용/2인용/3인 이상/4인 이상"과 같은 각 옵션명과 그에 대응하는 가로(폭)/세로(길이)/높이 스펙을 함께 짝지어 추출하십시오.
    - 숫자와 단위(cm, mm 등)를 훼손하거나 변경하지 말고 이미지에 적힌 그대로 보존하십시오.
-   - 이미지에서 일부분(하단 또는 측면)이 잘려서 흐리게 보이거나 보이지 않는 행은 마음대로 상상하여 추측하지 말고 "이미지에서 일부만 확인됨" 또는 "이미지에서 명확히 확인되지 않음"으로 처리하십시오.
    - 확실하게 식별되는 스펙 정보가 아예 없다면 "이미지에서 명확히 확인되지 않음"으로 처리하십시오.
 2. 이미지에서 확인된 색상:
    - 이미지 텍스트나 사진으로 명확히 확인되는 색상 종류를 추출한다. (예: 그레이, 브라운 등)
@@ -23,6 +22,17 @@ const SYSTEM_PROMPT = `
    - 확인되지 않으면 "이미지에서 명확히 확인되지 않음"으로 처리한다.
 4. 이미지에서 확인된 주의사항:
    - 세탁방법, 설치 시 유의점, 화기주의, 보관 주의사항 등 중요 경고 및 핵심 가이드를 추출한다.
+   - 특히 세탁 문구(예: '세탁 시 30도 이하에서 세탁')가 감지되면 빼놓지 말고 주의사항으로 상세히 기록하십시오.
+   - 확인되지 않으면 "이미지에서 명확히 확인되지 않음"으로 처리한다.
+5. 이미지에서 확인된 Fabric/소재/혼용률:
+   - ★매우 중요★ 이미지 내에 "Product Info", "Fabric", "Name", "Fit", "Laundry", "소재", "원단", "혼용률", "혼용 정보" 등의 영역이나 라벨이 있는지 초정밀 OCR 분석하십시오.
+   - 특히 "Fabric:" 이나 "소재:" 라벨 근처에 퍼센트(%)가 포함된 섬유 조합(예: 비스코스 50%, 폴리에스터 34%, 나일론 10%, 울 6%)이 있다면 이를 반드시 캡처하십시오.
+   - 만약 줄바꿈으로 혼용률 텍스트가 여러 줄에 나뉘어 있더라도, 하나의 혼용 정보이므로 연속된 텍스트로 완벽히 복원하여 한 줄로 합쳐서 작성하십시오.
+     예: "Fabric:\n비스코스 50%, 폴리에스터 34%,\n나일론 10%, 울 6%" -> "비스코스 50%, 폴리에스터 34%, 나일론 10%, 울 6%"
+   - 영문 라벨인 'Fabric'은 한국어 '소재/재질'로 해석하여 이에 상응하는 퍼센트 성분을 누락 없이 기록해 주십시오.
+   - 확인되지 않으면 "이미지에서 명확히 확인되지 않음"으로 처리한다.
+6. 이미지에서 확인된 Laundry/세탁 안내:
+   - 이미지에 'Laundry' 또는 '세탁 안내' 등의 세탁 관련 영역이 있거나 주의사항에 세탁 지침이 있으면 이를 정밀 판독하십시오. (예: '30도 이하 세탁')
    - 확인되지 않으면 "이미지에서 명확히 확인되지 않음"으로 처리한다.
 
 [신뢰도 표시 규칙]
@@ -34,7 +44,7 @@ const SYSTEM_PROMPT = `
 [출력 JSON 형식]
 반드시 아래 키 명칭만 사용하는 단일 JSON 객체로만 응답하세요. 다른 마크다운이나 부가 설명은 일체 배제하십시오.
 {
-  "infoText": "[이미지 분석 보완 정보]\\n- 이미지에서 확인된 옵션별 사이즈:\\n  · 소형: 폭 90 x 길이 190 x 높이 140cm [신뢰도: 중간]\\n  · 1인용: 폭 100 x 길이 195 x 높이 130cm [신뢰도: 중간]\\n- 이미지에서 확인된 색상: 이미지에서 명확히 확인되지 않음\\n- 이미지에서 확인된 구성/옵션: 소형, 1인용 등 옵션 확인 [신뢰도: 중간]\\n- 이미지에서 확인된 주의사항: 이미지에서 명확히 확인되지 않음"
+  "infoText": "[이미지 분석 보완 정보]\\n- 이미지에서 확인된 옵션별 사이즈:\\n  · 소형: 폭 90 x 길이 190 x 높이 140cm [신뢰도: 중간]\\n- 이미지에서 확인된 색상: 이미지에서 명확히 확인되지 않음\\n- 이미지에서 확인된 구성/옵션: 이미지에서 명확히 확인되지 않음\\n- 이미지에서 확인된 주의사항: 세탁 시 30도 이하에서 세탁 [신뢰도: 중간]\\n- 이미지에서 확인된 Fabric/소재/혼용률: 비스코스 50%, 폴리에스터 34%, 나일론 10%, 울 6% [신뢰도: 중간]\\n- 이미지에서 확인된 Laundry/세탁 안내: 30도 이하 세탁 [신뢰도: 중간]"
 }
 `;
 
@@ -89,12 +99,14 @@ function mergeImageAnalysisResults(results: string[]): string {
   const cautions = new Set<string>();
   const colors = new Set<string>();
   const options = new Set<string>();
+  const fabrics = new Set<string>();
+  const laundries = new Set<string>();
 
   const isUnknown = (str: string) => str.includes('확인되지 않음') || str.includes('확인 필요') || str.includes('일부만 확인됨');
 
   for (const text of results) {
     const lines = text.split('\n');
-    let section: 'sizes' | 'colors' | 'options' | 'cautions' | null = null;
+    let section: 'sizes' | 'colors' | 'options' | 'cautions' | 'fabrics' | 'laundries' | null = null;
 
     for (const line of lines) {
       const trimmed = line.trim();
@@ -116,6 +128,16 @@ function mergeImageAnalysisResults(results: string[]): string {
         section = 'cautions';
         const val = trimmed.substring(trimmed.indexOf(':') + 1).trim();
         if (val && !isUnknown(val)) cautions.add(val);
+        continue;
+      } else if (trimmed.includes('확인된 Fabric/소재/혼용률')) {
+        section = 'fabrics';
+        const val = trimmed.substring(trimmed.indexOf(':') + 1).trim();
+        if (val && !isUnknown(val)) fabrics.add(val);
+        continue;
+      } else if (trimmed.includes('확인된 Laundry/세탁 안내')) {
+        section = 'laundries';
+        const val = trimmed.substring(trimmed.indexOf(':') + 1).trim();
+        if (val && !isUnknown(val)) laundries.add(val);
         continue;
       }
 
@@ -157,6 +179,12 @@ function mergeImageAnalysisResults(results: string[]): string {
 
   const finalCaution = cautions.size > 0 ? Array.from(cautions).join(', ') : "이미지에서 명확히 확인되지 않음";
   finalLines.push(`- 이미지에서 확인된 주의사항: ${finalCaution}`);
+
+  const finalFabric = fabrics.size > 0 ? Array.from(fabrics).join(', ') : "이미지에서 명확히 확인되지 않음";
+  finalLines.push(`- 이미지에서 확인된 Fabric/소재/혼용률: ${finalFabric}`);
+
+  const finalLaundry = laundries.size > 0 ? Array.from(laundries).join(', ') : "이미지에서 명확히 확인되지 않음";
+  finalLines.push(`- 이미지에서 확인된 Laundry/세탁 안내: ${finalLaundry}`);
 
   return finalLines.join('\n');
 }

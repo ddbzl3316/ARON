@@ -3,6 +3,341 @@ import OpenAI from 'openai';
 import * as cheerio from 'cheerio';
 import iconv from 'iconv-lite';
 
+function extractMaterialFromPool(text: string): string | null {
+  const lines = text.split('\n');
+  const lower = text.toLowerCase();
+  
+  // [우선순위 1 & 3] Product Info / Fabric / 소재 / 원단 / 혼용률 영역의 명확한 혼용률 (퍼센트 % 포함)
+  // OCR 이나 이미지 스크랩 전체 텍스트에서 Fabric 관련 라벨 뒤의 혼용 정보를 가장 먼저 긁어옵니다.
+  // 특히 줄바꿈으로 나뉜 여러 줄의 혼용 정보를 결합하기 위해 j 인덱스 루프로 멀티라인 병합 수행.
+  const labels = ['fabric', 'product info', '소재', '원단', '혼용률', '혼용 정보'];
+  
+  for (let i = 0; i < lines.length; i++) {
+    const lineLower = lines[i].toLowerCase();
+    const matchedLabel = labels.find(label => lineLower.includes(label));
+    
+    if (matchedLabel) {
+      let compositeText = '';
+      const colonIdx = lines[i].indexOf(':');
+      if (colonIdx !== -1) {
+        compositeText = lines[i].substring(colonIdx + 1).trim();
+      }
+      
+      // 다음 연속된 4줄까지 스캔하여 % 수치가 들어가 있거나 섬유 키워드가 포함된 줄바꿈 정보를 하나로 결합
+      let j = i + 1;
+      let consecutiveLines = 0;
+      while (j < lines.length && consecutiveLines < 4) {
+        const nextLine = lines[j].trim();
+        const nextLineLower = nextLine.toLowerCase();
+        
+        const hasPercent = nextLine.includes('%');
+        const hasFiber = /비스코스|폴리에스터|폴리|나일론|울|면|코튼|마|린넨|레이온|스판|실크|wool|cotton|polyester|nylon/i.test(nextLineLower);
+        
+        if (nextLine && (hasPercent || hasFiber)) {
+          if (compositeText) {
+            if (compositeText.endsWith(',') || nextLine.startsWith(',')) {
+              compositeText += ' ' + nextLine;
+            } else {
+              compositeText += ', ' + nextLine;
+            }
+          } else {
+            compositeText = nextLine;
+          }
+          consecutiveLines++;
+          j++;
+        } else {
+          break;
+        }
+      }
+      
+      if (compositeText && compositeText.includes('%')) {
+        const cleanLine = compositeText
+          .replace(/\[신뢰도:\s*.*?\]/gi, '')
+          .replace(/\(수동\s*보완\)/gi, '')
+          .replace(/\(판매자\s*입력\s*기준\)/gi, '')
+          .trim();
+        if (cleanLine) return cleanLine;
+      }
+    }
+  }
+
+  // [우선순위 2] 고시정보 소재/재질이나 %가 포함된 혼용 텍스트 행 스캔
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.includes('%') && (
+      trimmed.includes('비스코스') || trimmed.includes('폴리에스터') || trimmed.includes('폴리') || 
+      trimmed.includes('나일론') || trimmed.includes('울') || trimmed.includes('면') || 
+      trimmed.includes('코튼') || trimmed.includes('마') || trimmed.includes('린넨') || 
+      trimmed.includes('레이온') || trimmed.includes('스판') || trimmed.includes('실크') ||
+      trimmed.includes('polyester') || trimmed.includes('cotton') || trimmed.includes('nylon') || trimmed.includes('wool')
+    )) {
+      if (trimmed.length < 150 && !trimmed.includes('할인') && !trimmed.includes('세일') && !trimmed.includes('적립')) {
+        const cleanLine = trimmed
+          .replace(/^-\s*(소재\/재질|소재|재질|원단)\s*[:：\-]*\s*/i, '')
+          .replace(/\[신뢰도:\s*.*?\]/gi, '')
+          .replace(/\(수동\s*보완\)/gi, '')
+          .trim();
+        if (cleanLine) return cleanLine;
+      }
+    }
+  }
+
+  // [우선순위 4] 주의사항/세탁 안내의 명확한 단일 소재 문구 (100% 및 95% + 5% 등)
+  if (lower.includes('폴리에스터 100%') || lower.includes('폴리 100%') || lower.includes('polyester 100%')) {
+    return "폴리에스터 100%";
+  }
+  if (lower.includes('면 100%') || lower.includes('코튼 100%') || lower.includes('cotton 100%')) {
+    return "면 100%";
+  }
+  if (lower.includes('나일론 100%') || lower.includes('nylon 100%')) {
+    return "나일론 100%";
+  }
+  
+  const span95Match = lower.match(/(폴리에스터|폴리)\s*95%\s*\+\s*(스판|스판덱스)\s*5%/i) || 
+                      lower.match(/polyester\s*95%\s*\+\s*(span|spandex)\s*5%/i);
+  if (span95Match) {
+    return "폴리에스터 95% + 스판 5%";
+  }
+  
+  if (lower.includes('폴리에스터/스판덱스 혼방') || lower.includes('폴리/스판 혼방') || lower.includes('폴리에스터 스판덱스 혼방')) {
+    return "폴리에스터/스판덱스 혼방";
+  }
+  if (lower.includes('폴리에스터 혼방') || lower.includes('폴리 혼방')) {
+    return "폴리에스터 혼방";
+  }
+  
+  // [우선순위 5] 일반 설명 문구 속 비율이 없는 일반 단어 언급
+  if (/(폴리에스터|폴리)\s*(원단|소재|재질)/i.test(lower) || /polyester\s*(fabric|material)/i.test(lower)) {
+    return "폴리에스터 소재";
+  }
+  if (/나일론\s*(원단|소재|재질)/i.test(lower)) {
+    return "나일론 소재";
+  }
+  if (/(면|코튼)\s*(원단|소재|재질)/i.test(lower) || /cotton\s*(fabric|material)/i.test(lower)) {
+    return "면 소재";
+  }
+
+  // 주의사항 영역 속 상품 소재 문맥 탐지
+  const cautionMatch = text.match(/(?:주의사항|관리방법|세탁)[\s\S]*?(폴리에스터|폴리)\s*(원단|소재|재질)/i);
+  if (cautionMatch) {
+    return "폴리에스터 소재";
+  }
+
+  return null;
+}
+
+function extractColorFromPool(text: string): string | null {
+  const lower = text.toLowerCase();
+  
+  // 1. 색상: 블랙, 화이트 등 명시적 구문 매치
+  const colorRegex = /(?:색상|컬러|색)\s*:\s*([가-힣a-zA-Z\s,·\-\/]+)(?:\n|\[|$)/i;
+  const match = text.match(colorRegex);
+  if (match) {
+    const val = match[1].trim();
+    if (val && val.length < 50 && !/확인되지|명시\s*없음|상세페이지/i.test(val)) {
+      return val;
+    }
+  }
+
+  // 2. 구체적인 예제 매칭
+  if (/내추럴\s*우드|네추럴\s*우드/i.test(lower)) {
+    return "내추럴 우드";
+  }
+  if (lower.includes('블랙, 그레이, 베이지')) {
+    return "블랙, 그레이, 베이지";
+  }
+  if (lower.includes('블랙, 화이트') || lower.includes('화이트, 블랙')) {
+    return "블랙, 화이트";
+  }
+  if (lower.includes('화이트, 블랙, 차콜')) {
+    return "화이트, 블랙, 차콜";
+  }
+
+  return null;
+}
+
+function extractSizeFromPool(text: string): string | null {
+  const lower = text.toLowerCase();
+
+  // 1. 복합/구체적인 크기 매칭
+  const match4d = text.match(/(\d+\s*x\s*\d+\s*x\s*\d+\s*x\s*\d+\s*mm)/i);
+  if (match4d) return match4d[1];
+
+  const match2d = text.match(/(\d+\s*x\s*\d+\s*mm)/i) || text.match(/(\d+\s*x\s*\d+\s*cm)/i);
+  if (match2d) return match2d[1];
+
+  // 요가매트 등 두께 6mm
+  if (lower.includes('6mm')) {
+    return "6mm";
+  }
+
+  // M, L, XL 의류 사이즈 목록
+  if (/사이즈\s*:\s*(m,\s*l,\s*xl)/i.test(lower) || /([mlxl2xl\s,]+)\s*사이즈/i.test(lower)) {
+    return "M, L, XL";
+  }
+
+  return null;
+}
+
+function extractWashFromPool(text: string): string | null {
+  const lower = text.toLowerCase();
+
+  if (lower.includes('30도 이하로 세탁') || lower.includes('30도 이하 세탁') || lower.includes('30도이하') || lower.includes('30도 이하에서 세탁')) {
+    return "30도 이하 세탁";
+  }
+  if (lower.includes('드라이클리닝')) {
+    return "드라이클리닝";
+  }
+  if (lower.includes('단독 손세탁') || lower.includes('손세탁')) {
+    return "단독 손세탁";
+  }
+
+  // 주의사항이나 Laundry 영역 내 세탁 스펙 정규식 탐지
+  const washMatch = text.match(/(?:주의사항|laundry|세탁|관리)[\s\S]*?(\d+도\s*이하[가-힣\s]*세탁)/i);
+  if (washMatch) {
+    return washMatch[1].trim();
+  }
+
+  return null;
+}
+
+function recalculateMissingFields(parsedInfo: string): string {
+  const lines = parsedInfo.split('\n');
+  const absenceKeywords = ["명시 없음", "확인되지 않음", "미확인", "제공 여부 확인 필요", "확인 필요", "별도 표기 없음"];
+  
+  const isAbsent = (val: string) => {
+    const cleanVal = val.toLowerCase().trim();
+    if (!cleanVal) return true;
+    return absenceKeywords.some(kw => cleanVal.includes(kw));
+  };
+
+  // 1. 현재 필드들의 실재 유무 상태 분석
+  let hasMaterial = true;
+  let hasWash = true;
+  let hasCaution = true;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('- 소재/재질:')) {
+      const val = trimmed.substring(trimmed.indexOf(':') + 1).trim();
+      if (isAbsent(val)) hasMaterial = false;
+    }
+    if (trimmed.startsWith('- 세탁/관리 방법:')) {
+      const val = trimmed.substring(trimmed.indexOf(':') + 1).trim();
+      if (isAbsent(val)) hasWash = false;
+    }
+    if (trimmed.startsWith('- 주의사항:')) {
+      const val = trimmed.substring(trimmed.indexOf(':') + 1).trim();
+      if (isAbsent(val)) hasCaution = false;
+    }
+  }
+
+  // 2. '상세페이지 내 확인되지 않는 주요 항목:' 섹션 찾아서 재필터링
+  const updatedLines: string[] = [];
+  let insideMissingBlock = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith('상세페이지 내 확인되지 않는 주요 항목:')) {
+      insideMissingBlock = true;
+      updatedLines.push(line);
+      continue;
+    }
+
+    if (insideMissingBlock) {
+      // 다른 대섹션을 만나면 블록 탈출
+      if (trimmed.startsWith('[') || (trimmed.startsWith('-') && trimmed.includes(':'))) {
+        insideMissingBlock = false;
+        updatedLines.push(line);
+        continue;
+      }
+
+      // 누락 항목 라인인 경우 (- 색상, - 구성품 등)
+      if (trimmed.startsWith('-')) {
+        const itemName = trimmed.substring(1).trim();
+        
+        if (itemName.includes('소재') || itemName.includes('재질')) {
+          if (hasMaterial) continue; // 승격 완료되었으므로 누락에서 제거
+        }
+        if (itemName.includes('세탁') || itemName.includes('관리')) {
+          if (hasWash) continue; // 승격 완료되었으므로 누락에서 제거
+        }
+        if (itemName.includes('주의사항')) {
+          if (hasCaution) continue; // 실재하므로 누락에서 제거
+        }
+      }
+    }
+
+    updatedLines.push(line);
+  }
+
+  return updatedLines.join('\n');
+}
+
+function promoteProductSpecs(parsedInfo: string, scrapedContent: string, cleanedOcr: string): string {
+  const textPool = (scrapedContent + "\n" + cleanedOcr).trim();
+  const absenceKeywords = ["명시 없음", "확인되지 않음", "미확인", "제공 여부 확인 필요", "확인 필요", "별도 표기 없음"];
+  
+  const isAbsent = (val: string) => {
+    const cleanVal = val.toLowerCase().trim();
+    if (!cleanVal) return true;
+    return absenceKeywords.some(kw => cleanVal.includes(kw));
+  };
+
+  const lines = parsedInfo.split('\n');
+  const updatedLines = lines.map(line => {
+    const trimmed = line.trim();
+    
+    if (trimmed.startsWith('- 소재/재질:')) {
+      const val = trimmed.substring(trimmed.indexOf(':') + 1).trim();
+      if (isAbsent(val)) {
+        const material = extractMaterialFromPool(textPool);
+        if (material) {
+          return `- 소재/재질: ${material} (자동 승격) [신뢰도: 높음]`;
+        }
+      }
+    }
+    
+    if (trimmed.startsWith('- 색상:')) {
+      const val = trimmed.substring(trimmed.indexOf(':') + 1).trim();
+      if (isAbsent(val)) {
+        const color = extractColorFromPool(textPool);
+        if (color) {
+          return `- 색상: ${color} (자동 승격) [신뢰도: 높음]`;
+        }
+      }
+    }
+
+    if (trimmed.startsWith('- 사이즈/규격:')) {
+      const val = trimmed.substring(trimmed.indexOf(':') + 1).trim();
+      if (isAbsent(val)) {
+        const size = extractSizeFromPool(textPool);
+        if (size) {
+          return `- 사이즈/규격: ${size} (자동 승격) [신뢰도: 높음]`;
+        }
+      }
+    }
+
+    if (trimmed.startsWith('- 세탁/관리 방법:')) {
+      const val = trimmed.substring(trimmed.indexOf(':') + 1).trim();
+      if (isAbsent(val)) {
+        const wash = extractWashFromPool(textPool);
+        if (wash) {
+          const confidence = wash.includes('30도') || wash.includes('드라이') ? '중간' : '높음';
+          return `- 세탁/관리 방법: ${wash} (자동 승격) [신뢰도: ${confidence}]`;
+        }
+      }
+    }
+
+    return line;
+  });
+
+  const finalInfo = updatedLines.join('\n');
+  return recalculateMissingFields(finalInfo);
+}
+
 function mergeAutoOcrIntoProductInfo(originalInfo: string, ocrText: string): string {
   if (!ocrText) return originalInfo;
   
@@ -3070,6 +3405,9 @@ ${structuredInfoText}
     
     let parsedInfo = jsonResult.infoText || jsonResult.productInfo || jsonResult.info || '';
 
+    // 스펙 자동 승격 1차 적용
+    parsedInfo = promoteProductSpecs(parsedInfo, scrapedContent, '');
+
     // --- v0.5.3-B: DHT-B2B 이미지 자동 분할 OCR 및 productInfo 자동 병합 파이프라인 ---
     // 모든 후보의 상태 및 결과 텍스트 완벽 초기화 (데이터 섞임 방지)
     if (imageCandidates && imageCandidates.candidates) {
@@ -3159,6 +3497,9 @@ ${structuredInfoText}
 
                   // 3. 기존 mergeAutoOcrIntoProductInfo 병합 실행
                   parsedInfo = mergeAutoOcrIntoProductInfo(parsedInfo, cleanedOcr);
+
+                  // 4. 스펙 자동 승격 2차 적용 (OCR 텍스트 포함)
+                  parsedInfo = promoteProductSpecs(parsedInfo, scrapedContent, cleanedOcr);
 
                   // 동기화: imageCandidates 내 해당 후보 상태 갱신 (단 1개만)
                   const matchedCandidate = imageCandidates.candidates.find(

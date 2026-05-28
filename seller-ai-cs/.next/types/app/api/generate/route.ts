@@ -1,4 +1,4 @@
-// File: C:\Users\USER\초보프로젝트\connect-ai\seller-ai-cs\src\app\api\generate\route.ts
+// File: D:\초보프로젝트\connect-ai\seller-ai-cs\src\app\api\generate\route.ts
 import * as entry from '../../../../../src/app/api/generate/route.js'
 import type { NextRequest } from 'next/server.js'
 

@@ -7,3 +7,43 @@ preview.html
 releases/
 .env
 *.bak.*
+
+# Next.js / build output
+.next/
+build/
+dist/
+
+# cache
+.cache/
+.turbo/
+.vercel/
+
+# backup
+_backup/
+*.bak
+*.bak.*
+*.backup*
+page.backup-*.tsx
+*.backup-*.tsx
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# env
+.env
+.env.local
+.env.*.local
+
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# large pixel/image asset packs
+assets/pixel/
+
+seller-ai-cs/

@@ -1,196 +1,47 @@
-"use strict";
-/*
- * ATTENTION: An "eval-source-map" devtool has been used.
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file with attached SourceMaps in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
-(() => {
-var exports = {};
-exports.id = "app/api/analyze-image/route";
-exports.ids = ["app/api/analyze-image/route"];
-exports.modules = {
+"use strict";(()=>{var e={};e.id=438,e.ids=[438],e.modules={399:e=>{e.exports=require("next/dist/compiled/next-server/app-page.runtime.prod.js")},517:e=>{e.exports=require("next/dist/compiled/next-server/app-route.runtime.prod.js")},7147:e=>{e.exports=require("fs")},3685:e=>{e.exports=require("http")},5687:e=>{e.exports=require("https")},7561:e=>{e.exports=require("node:fs")},4492:e=>{e.exports=require("node:stream")},2477:e=>{e.exports=require("node:stream/web")},1017:e=>{e.exports=require("path")},5477:e=>{e.exports=require("punycode")},2781:e=>{e.exports=require("stream")},7310:e=>{e.exports=require("url")},3837:e=>{e.exports=require("util")},1267:e=>{e.exports=require("worker_threads")},9796:e=>{e.exports=require("zlib")},1570:(e,t,r)=>{r.r(t),r.d(t,{originalPathname:()=>b,patchFetch:()=>w,requestAsyncStorage:()=>h,routeModule:()=>g,serverHooks:()=>x,staticGenerationAsyncStorage:()=>y});var i={};r.r(i),r.d(i,{POST:()=>f});var s=r(9303),n=r(8716),a=r(670),o=r(7070),l=r(4214);let u=require("sharp");var c=r.n(u);let p=`
+당신은 온라인 커머스 상세페이지 이미지 분석 전문가이자 초정밀 Vision OCR 모델입니다.
+주어진 이미지를 픽셀 단위로 정밀하게 분석하여 아래 6대 핵심 CS 항목을 추출해주세요.
 
-/***/ "next/dist/compiled/next-server/app-page.runtime.dev.js":
-/*!*************************************************************************!*\
-  !*** external "next/dist/compiled/next-server/app-page.runtime.dev.js" ***!
-  \*************************************************************************/
-/***/ ((module) => {
+[초정밀 분석 대상 및 작성 규칙]
+1. 이미지에서 확인된 옵션별 사이즈:
+   - ★중요★ 이 이미지는 쇼핑몰 상세페이지의 사이즈표/옵션표/규격표일 가능성이 매우 높습니다.
+   - 이미지 안의 작은 글자와 표의 텍스트(숫자, 단위 등)를 최우선적으로 정밀 판독(OCR)하십시오.
+   - 표나 텍스트에 규격이 여러 개 존재한다면, 절대 대표값 하나로 요약하거나 생략하지 말고 모든 행을 개별적으로 읽어와 빠짐없이 목록화하십시오.
+   - "소형/1인용/2인용/3인 이상/4인 이상"과 같은 각 옵션명과 그에 대응하는 가로(폭)/세로(길이)/높이 스펙을 함께 짝지어 추출하십시오.
+   - 숫자와 단위(cm, mm 등)를 훼손하거나 변경하지 말고 이미지에 적힌 그대로 보존하십시오.
+   - 확실하게 식별되는 스펙 정보가 아예 없다면 "이미지에서 명확히 확인되지 않음"으로 처리하십시오.
+2. 이미지에서 확인된 색상:
+   - 이미지 텍스트나 사진으로 명확히 확인되는 색상 종류를 추출한다. (예: 그레이, 브라운 등)
+   - 확인되지 않으면 "이미지에서 명확히 확인되지 않음"으로 처리한다.
+3. 이미지에서 확인된 구성/옵션:
+   - 제품 세트 구성이나 세부 구성품 옵션 정보를 추출한다.
+   - 확인되지 않으면 "이미지에서 명확히 확인되지 않음"으로 처리한다.
+4. 이미지에서 확인된 주의사항:
+   - 세탁방법, 설치 시 유의점, 화기주의, 보관 주의사항 등 중요 경고 및 핵심 가이드를 추출한다.
+   - 특히 세탁 문구(예: '세탁 시 30도 이하에서 세탁')가 감지되면 빼놓지 말고 주의사항으로 상세히 기록하십시오.
+   - 확인되지 않으면 "이미지에서 명확히 확인되지 않음"으로 처리한다.
+5. 이미지에서 확인된 Fabric/소재/혼용률:
+   - ★매우 중요★ 이미지 내에 "Product Info", "Fabric", "Name", "Fit", "Laundry", "소재", "원단", "혼용률", "혼용 정보" 등의 영역이나 라벨이 있는지 초정밀 OCR 분석하십시오.
+   - 특히 "Fabric:" 이나 "소재:" 라벨 근처에 퍼센트(%)가 포함된 섬유 조합(예: 비스코스 50%, 폴리에스터 34%, 나일론 10%, 울 6%)이 있다면 이를 반드시 캡처하십시오.
+   - 만약 줄바꿈으로 혼용률 텍스트가 여러 줄에 나뉘어 있더라도, 하나의 혼용 정보이므로 연속된 텍스트로 완벽히 복원하여 한 줄로 합쳐서 작성하십시오.
+     예: "Fabric:
+비스코스 50%, 폴리에스터 34%,
+나일론 10%, 울 6%" -> "비스코스 50%, 폴리에스터 34%, 나일론 10%, 울 6%"
+   - 영문 라벨인 'Fabric'은 한국어 '소재/재질'로 해석하여 이에 상응하는 퍼센트 성분을 누락 없이 기록해 주십시오.
+   - 확인되지 않으면 "이미지에서 명확히 확인되지 않음"으로 처리한다.
+6. 이미지에서 확인된 Laundry/세탁 안내:
+   - 이미지에 'Laundry' 또는 '세탁 안내' 등의 세탁 관련 영역이 있거나 주의사항에 세탁 지침이 있으면 이를 정밀 판독하십시오. (예: '30도 이하 세탁')
+   - 확인되지 않으면 "이미지에서 명확히 확인되지 않음"으로 처리한다.
 
-module.exports = require("next/dist/compiled/next-server/app-page.runtime.dev.js");
+[신뢰도 표시 규칙]
+추출된 각 세부 사항 끝에 다음과 같이 대괄호 형태의 신뢰도 지표를 꼭 붙여주십시오.
+- 이미지 텍스트로 직접 명확히 확인된 정보 ➔ "[신뢰도: 중간]"으로 명시
+- 정황이나 레이아웃으로 유추한 정보 ➔ "[신뢰도: 중간]" 또는 "[신뢰도: 낮음]"으로 명시
+- 확실하지 않거나 누락된 정보 ➔ "이미지에서 명확히 확인되지 않음" 또는 "명확히 확인되지 않음"으로 표시
 
-/***/ }),
-
-/***/ "next/dist/compiled/next-server/app-route.runtime.dev.js":
-/*!**************************************************************************!*\
-  !*** external "next/dist/compiled/next-server/app-route.runtime.dev.js" ***!
-  \**************************************************************************/
-/***/ ((module) => {
-
-module.exports = require("next/dist/compiled/next-server/app-route.runtime.dev.js");
-
-/***/ }),
-
-/***/ "fs":
-/*!*********************!*\
-  !*** external "fs" ***!
-  \*********************/
-/***/ ((module) => {
-
-module.exports = require("fs");
-
-/***/ }),
-
-/***/ "http":
-/*!***********************!*\
-  !*** external "http" ***!
-  \***********************/
-/***/ ((module) => {
-
-module.exports = require("http");
-
-/***/ }),
-
-/***/ "https":
-/*!************************!*\
-  !*** external "https" ***!
-  \************************/
-/***/ ((module) => {
-
-module.exports = require("https");
-
-/***/ }),
-
-/***/ "node:fs":
-/*!**************************!*\
-  !*** external "node:fs" ***!
-  \**************************/
-/***/ ((module) => {
-
-module.exports = require("node:fs");
-
-/***/ }),
-
-/***/ "node:stream":
-/*!******************************!*\
-  !*** external "node:stream" ***!
-  \******************************/
-/***/ ((module) => {
-
-module.exports = require("node:stream");
-
-/***/ }),
-
-/***/ "node:stream/web":
-/*!**********************************!*\
-  !*** external "node:stream/web" ***!
-  \**********************************/
-/***/ ((module) => {
-
-module.exports = require("node:stream/web");
-
-/***/ }),
-
-/***/ "path":
-/*!***********************!*\
-  !*** external "path" ***!
-  \***********************/
-/***/ ((module) => {
-
-module.exports = require("path");
-
-/***/ }),
-
-/***/ "punycode":
-/*!***************************!*\
-  !*** external "punycode" ***!
-  \***************************/
-/***/ ((module) => {
-
-module.exports = require("punycode");
-
-/***/ }),
-
-/***/ "stream":
-/*!*************************!*\
-  !*** external "stream" ***!
-  \*************************/
-/***/ ((module) => {
-
-module.exports = require("stream");
-
-/***/ }),
-
-/***/ "url":
-/*!**********************!*\
-  !*** external "url" ***!
-  \**********************/
-/***/ ((module) => {
-
-module.exports = require("url");
-
-/***/ }),
-
-/***/ "util":
-/*!***********************!*\
-  !*** external "util" ***!
-  \***********************/
-/***/ ((module) => {
-
-module.exports = require("util");
-
-/***/ }),
-
-/***/ "worker_threads":
-/*!*********************************!*\
-  !*** external "worker_threads" ***!
-  \*********************************/
-/***/ ((module) => {
-
-module.exports = require("worker_threads");
-
-/***/ }),
-
-/***/ "zlib":
-/*!***********************!*\
-  !*** external "zlib" ***!
-  \***********************/
-/***/ ((module) => {
-
-module.exports = require("zlib");
-
-/***/ }),
-
-/***/ "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader.js?name=app%2Fapi%2Fanalyze-image%2Froute&page=%2Fapi%2Fanalyze-image%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fanalyze-image%2Froute.ts&appDir=C%3A%5CUsers%5CUSER%5C%EC%B4%88%EB%B3%B4%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%5Cconnect-ai%5Cseller-ai-cs%5Csrc%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CUSER%5C%EC%B4%88%EB%B3%B4%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%5Cconnect-ai%5Cseller-ai-cs&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D!":
-/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/next/dist/build/webpack/loaders/next-app-loader.js?name=app%2Fapi%2Fanalyze-image%2Froute&page=%2Fapi%2Fanalyze-image%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fanalyze-image%2Froute.ts&appDir=C%3A%5CUsers%5CUSER%5C%EC%B4%88%EB%B3%B4%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%5Cconnect-ai%5Cseller-ai-cs%5Csrc%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CUSER%5C%EC%B4%88%EB%B3%B4%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%5Cconnect-ai%5Cseller-ai-cs&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D! ***!
-  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   originalPathname: () => (/* binding */ originalPathname),\n/* harmony export */   patchFetch: () => (/* binding */ patchFetch),\n/* harmony export */   requestAsyncStorage: () => (/* binding */ requestAsyncStorage),\n/* harmony export */   routeModule: () => (/* binding */ routeModule),\n/* harmony export */   serverHooks: () => (/* binding */ serverHooks),\n/* harmony export */   staticGenerationAsyncStorage: () => (/* binding */ staticGenerationAsyncStorage)\n/* harmony export */ });\n/* harmony import */ var next_dist_server_future_route_modules_app_route_module_compiled__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! next/dist/server/future/route-modules/app-route/module.compiled */ \"(rsc)/./node_modules/next/dist/server/future/route-modules/app-route/module.compiled.js\");\n/* harmony import */ var next_dist_server_future_route_modules_app_route_module_compiled__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(next_dist_server_future_route_modules_app_route_module_compiled__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var next_dist_server_future_route_kind__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! next/dist/server/future/route-kind */ \"(rsc)/./node_modules/next/dist/server/future/route-kind.js\");\n/* harmony import */ var next_dist_server_lib_patch_fetch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! next/dist/server/lib/patch-fetch */ \"(rsc)/./node_modules/next/dist/server/lib/patch-fetch.js\");\n/* harmony import */ var next_dist_server_lib_patch_fetch__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(next_dist_server_lib_patch_fetch__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var C_Users_USER_connect_ai_seller_ai_cs_src_app_api_analyze_image_route_ts__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./src/app/api/analyze-image/route.ts */ \"(rsc)/./src/app/api/analyze-image/route.ts\");\n\n\n\n\n// We inject the nextConfigOutput here so that we can use them in the route\n// module.\nconst nextConfigOutput = \"\"\nconst routeModule = new next_dist_server_future_route_modules_app_route_module_compiled__WEBPACK_IMPORTED_MODULE_0__.AppRouteRouteModule({\n    definition: {\n        kind: next_dist_server_future_route_kind__WEBPACK_IMPORTED_MODULE_1__.RouteKind.APP_ROUTE,\n        page: \"/api/analyze-image/route\",\n        pathname: \"/api/analyze-image\",\n        filename: \"route\",\n        bundlePath: \"app/api/analyze-image/route\"\n    },\n    resolvedPagePath: \"C:\\\\Users\\\\USER\\\\초보프로젝트\\\\connect-ai\\\\seller-ai-cs\\\\src\\\\app\\\\api\\\\analyze-image\\\\route.ts\",\n    nextConfigOutput,\n    userland: C_Users_USER_connect_ai_seller_ai_cs_src_app_api_analyze_image_route_ts__WEBPACK_IMPORTED_MODULE_3__\n});\n// Pull out the exports that we need to expose from the module. This should\n// be eliminated when we've moved the other routes to the new format. These\n// are used to hook into the route.\nconst { requestAsyncStorage, staticGenerationAsyncStorage, serverHooks } = routeModule;\nconst originalPathname = \"/api/analyze-image/route\";\nfunction patchFetch() {\n    return (0,next_dist_server_lib_patch_fetch__WEBPACK_IMPORTED_MODULE_2__.patchFetch)({\n        serverHooks,\n        staticGenerationAsyncStorage\n    });\n}\n\n\n//# sourceMappingURL=app-route.js.map//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9ub2RlX21vZHVsZXMvbmV4dC9kaXN0L2J1aWxkL3dlYnBhY2svbG9hZGVycy9uZXh0LWFwcC1sb2FkZXIuanM/bmFtZT1hcHAlMkZhcGklMkZhbmFseXplLWltYWdlJTJGcm91dGUmcGFnZT0lMkZhcGklMkZhbmFseXplLWltYWdlJTJGcm91dGUmYXBwUGF0aHM9JnBhZ2VQYXRoPXByaXZhdGUtbmV4dC1hcHAtZGlyJTJGYXBpJTJGYW5hbHl6ZS1pbWFnZSUyRnJvdXRlLnRzJmFwcERpcj1DJTNBJTVDVXNlcnMlNUNVU0VSJTVDJUVDJUI0JTg4JUVCJUIzJUI0JUVEJTk0JTg0JUVCJUExJTlDJUVDJUEwJTlEJUVEJThBJUI4JTVDY29ubmVjdC1haSU1Q3NlbGxlci1haS1jcyU1Q3NyYyU1Q2FwcCZwYWdlRXh0ZW5zaW9ucz10c3gmcGFnZUV4dGVuc2lvbnM9dHMmcGFnZUV4dGVuc2lvbnM9anN4JnBhZ2VFeHRlbnNpb25zPWpzJnJvb3REaXI9QyUzQSU1Q1VzZXJzJTVDVVNFUiU1QyVFQyVCNCU4OCVFQiVCMyVCNCVFRCU5NCU4NCVFQiVBMSU5QyVFQyVBMCU5RCVFRCU4QSVCOCU1Q2Nvbm5lY3QtYWklNUNzZWxsZXItYWktY3MmaXNEZXY9dHJ1ZSZ0c2NvbmZpZ1BhdGg9dHNjb25maWcuanNvbiZiYXNlUGF0aD0mYXNzZXRQcmVmaXg9Jm5leHRDb25maWdPdXRwdXQ9JnByZWZlcnJlZFJlZ2lvbj0mbWlkZGxld2FyZUNvbmZpZz1lMzAlM0QhIiwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7OztBQUFzRztBQUN2QztBQUNjO0FBQ3lDO0FBQ3RIO0FBQ0E7QUFDQTtBQUNBLHdCQUF3QixnSEFBbUI7QUFDM0M7QUFDQSxjQUFjLHlFQUFTO0FBQ3ZCO0FBQ0E7QUFDQTtBQUNBO0FBQ0EsS0FBSztBQUNMO0FBQ0E7QUFDQSxZQUFZO0FBQ1osQ0FBQztBQUNEO0FBQ0E7QUFDQTtBQUNBLFFBQVEsaUVBQWlFO0FBQ3pFO0FBQ0E7QUFDQSxXQUFXLDRFQUFXO0FBQ3RCO0FBQ0E7QUFDQSxLQUFLO0FBQ0w7QUFDdUg7O0FBRXZIIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vc2VsbGVyLWFpLWNzLz9iNWNiIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEFwcFJvdXRlUm91dGVNb2R1bGUgfSBmcm9tIFwibmV4dC9kaXN0L3NlcnZlci9mdXR1cmUvcm91dGUtbW9kdWxlcy9hcHAtcm91dGUvbW9kdWxlLmNvbXBpbGVkXCI7XG5pbXBvcnQgeyBSb3V0ZUtpbmQgfSBmcm9tIFwibmV4dC9kaXN0L3NlcnZlci9mdXR1cmUvcm91dGUta2luZFwiO1xuaW1wb3J0IHsgcGF0Y2hGZXRjaCBhcyBfcGF0Y2hGZXRjaCB9IGZyb20gXCJuZXh0L2Rpc3Qvc2VydmVyL2xpYi9wYXRjaC1mZXRjaFwiO1xuaW1wb3J0ICogYXMgdXNlcmxhbmQgZnJvbSBcIkM6XFxcXFVzZXJzXFxcXFVTRVJcXFxc7LSI67O07ZSE66Gc7KCd7Yq4XFxcXGNvbm5lY3QtYWlcXFxcc2VsbGVyLWFpLWNzXFxcXHNyY1xcXFxhcHBcXFxcYXBpXFxcXGFuYWx5emUtaW1hZ2VcXFxccm91dGUudHNcIjtcbi8vIFdlIGluamVjdCB0aGUgbmV4dENvbmZpZ091dHB1dCBoZXJlIHNvIHRoYXQgd2UgY2FuIHVzZSB0aGVtIGluIHRoZSByb3V0ZVxuLy8gbW9kdWxlLlxuY29uc3QgbmV4dENvbmZpZ091dHB1dCA9IFwiXCJcbmNvbnN0IHJvdXRlTW9kdWxlID0gbmV3IEFwcFJvdXRlUm91dGVNb2R1bGUoe1xuICAgIGRlZmluaXRpb246IHtcbiAgICAgICAga2luZDogUm91dGVLaW5kLkFQUF9ST1VURSxcbiAgICAgICAgcGFnZTogXCIvYXBpL2FuYWx5emUtaW1hZ2Uvcm91dGVcIixcbiAgICAgICAgcGF0aG5hbWU6IFwiL2FwaS9hbmFseXplLWltYWdlXCIsXG4gICAgICAgIGZpbGVuYW1lOiBcInJvdXRlXCIsXG4gICAgICAgIGJ1bmRsZVBhdGg6IFwiYXBwL2FwaS9hbmFseXplLWltYWdlL3JvdXRlXCJcbiAgICB9LFxuICAgIHJlc29sdmVkUGFnZVBhdGg6IFwiQzpcXFxcVXNlcnNcXFxcVVNFUlxcXFzstIjrs7TtlITroZzsoJ3tirhcXFxcY29ubmVjdC1haVxcXFxzZWxsZXItYWktY3NcXFxcc3JjXFxcXGFwcFxcXFxhcGlcXFxcYW5hbHl6ZS1pbWFnZVxcXFxyb3V0ZS50c1wiLFxuICAgIG5leHRDb25maWdPdXRwdXQsXG4gICAgdXNlcmxhbmRcbn0pO1xuLy8gUHVsbCBvdXQgdGhlIGV4cG9ydHMgdGhhdCB3ZSBuZWVkIHRvIGV4cG9zZSBmcm9tIHRoZSBtb2R1bGUuIFRoaXMgc2hvdWxkXG4vLyBiZSBlbGltaW5hdGVkIHdoZW4gd2UndmUgbW92ZWQgdGhlIG90aGVyIHJvdXRlcyB0byB0aGUgbmV3IGZvcm1hdC4gVGhlc2Vcbi8vIGFyZSB1c2VkIHRvIGhvb2sgaW50byB0aGUgcm91dGUuXG5jb25zdCB7IHJlcXVlc3RBc3luY1N0b3JhZ2UsIHN0YXRpY0dlbmVyYXRpb25Bc3luY1N0b3JhZ2UsIHNlcnZlckhvb2tzIH0gPSByb3V0ZU1vZHVsZTtcbmNvbnN0IG9yaWdpbmFsUGF0aG5hbWUgPSBcIi9hcGkvYW5hbHl6ZS1pbWFnZS9yb3V0ZVwiO1xuZnVuY3Rpb24gcGF0Y2hGZXRjaCgpIHtcbiAgICByZXR1cm4gX3BhdGNoRmV0Y2goe1xuICAgICAgICBzZXJ2ZXJIb29rcyxcbiAgICAgICAgc3RhdGljR2VuZXJhdGlvbkFzeW5jU3RvcmFnZVxuICAgIH0pO1xufVxuZXhwb3J0IHsgcm91dGVNb2R1bGUsIHJlcXVlc3RBc3luY1N0b3JhZ2UsIHN0YXRpY0dlbmVyYXRpb25Bc3luY1N0b3JhZ2UsIHNlcnZlckhvb2tzLCBvcmlnaW5hbFBhdGhuYW1lLCBwYXRjaEZldGNoLCAgfTtcblxuLy8jIHNvdXJjZU1hcHBpbmdVUkw9YXBwLXJvdXRlLmpzLm1hcCJdLCJuYW1lcyI6W10sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader.js?name=app%2Fapi%2Fanalyze-image%2Froute&page=%2Fapi%2Fanalyze-image%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fanalyze-image%2Froute.ts&appDir=C%3A%5CUsers%5CUSER%5C%EC%B4%88%EB%B3%B4%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%5Cconnect-ai%5Cseller-ai-cs%5Csrc%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CUSER%5C%EC%B4%88%EB%B3%B4%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%5Cconnect-ai%5Cseller-ai-cs&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D!\n");
-
-/***/ }),
-
-/***/ "(rsc)/./src/app/api/analyze-image/route.ts":
-/*!********************************************!*\
-  !*** ./src/app/api/analyze-image/route.ts ***!
-  \********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   POST: () => (/* binding */ POST)\n/* harmony export */ });\n/* harmony import */ var next_server__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! next/server */ \"(rsc)/./node_modules/next/dist/api/server.js\");\n/* harmony import */ var openai__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! openai */ \"(rsc)/./node_modules/openai/index.mjs\");\n\n\nconst SYSTEM_PROMPT = `\n당신은 온라인 커머스 상세페이지 이미지 분석 전문가입니다.\n주어진 하나 또는 여러 장의 이미지를 분석하여 아래 핵심 CS 항목을 추출해주세요.\n\n[추출 항목]\n- 상품명\n- 상품 종류\n- 소재\n- 사이즈\n- 색상\n- 구성품\n- 무게\n- 사용 용도\n- 인증/KC/KF/시험성적서 여부\n- 주의사항\n- 제조국\n- 세탁방법\n- 판매자가 확인해야 할 정보 (특이사항)\n\n[핵심 원칙]\n1. 이미지 내 표(Table)뿐만 아니라 서술형 문장(예: \"~소재입니다\", \"~로 제작되었습니다\", \"~혼용입니다\", \"~권장합니다\" 등)에서도 '소재', '세탁방법', '구성품', '사이즈', '주의사항' 등의 핵심 스펙 정보를 적극적으로 찾아내 추출할 것.\n2. 서술형 문장이라도 스펙이 명확하다면 구조화하여 표시할 것. (예: \"폴리에스터 100% 소재입니다\" -> \"소재: 폴리에스터 100% [이미지에서 확인됨]\")\n3. 이미지에서 글자로 직접 확인된 정보와 AI가 형태나 정황상 추정한 정보를 반드시 명확하게 구분해서 작성할 것.\n   - 예: 소재: 면 100% [이미지에서 확인됨]\n   - 예: 사용 용도: 야외 스포츠용 [AI 추정]\n4. 이미지 내에서 전혀 단서를 찾을 수 없는 항목은 지어내지 말고 반드시 \"이미지 내 확인되지 않음\"으로 표기할 것.\n5. 보기 좋게 불릿 포인트(-) 형태로 깔끔하게 정리할 것.\n\n[출력 형식]\n반드시 아래 JSON 형식으로만 응답하세요.\n{\n  \"infoText\": \"분석된 상품 정보 텍스트\"\n}\n`;\nasync function POST(req) {\n    try {\n        const { images } = await req.json(); // Array of base64 data URLs\n        if (!images || !Array.isArray(images) || images.length === 0) {\n            return next_server__WEBPACK_IMPORTED_MODULE_0__.NextResponse.json({\n                error: \"이미지가 제공되지 않았습니다.\"\n            }, {\n                status: 400\n            });\n        }\n        const apiKey = process.env.OPENAI_API_KEY;\n        if (!apiKey) {\n            const mockResult = `[이미지 자동 분석 (Mock)]\\nAPI 키가 설정되지 않아 실제 Vision 분석은 진행되지 않았습니다.\\n(총 ${images.length}장의 이미지가 수신되었습니다.)`;\n            return next_server__WEBPACK_IMPORTED_MODULE_0__.NextResponse.json({\n                infoText: mockResult\n            });\n        }\n        const openai = new openai__WEBPACK_IMPORTED_MODULE_1__[\"default\"]({\n            apiKey\n        });\n        const modelName = process.env.OPENAI_MODEL || \"gpt-4o-mini\";\n        const messageContent = [\n            {\n                type: \"text\",\n                text: \"첨부된 상세페이지 이미지를 분석해주세요.\"\n            }\n        ];\n        for (const imgBase64 of images){\n            messageContent.push({\n                type: \"image_url\",\n                image_url: {\n                    url: imgBase64,\n                    detail: \"auto\"\n                }\n            });\n        }\n        const completion = await openai.chat.completions.create({\n            model: modelName,\n            messages: [\n                {\n                    role: \"system\",\n                    content: SYSTEM_PROMPT\n                },\n                {\n                    role: \"user\",\n                    content: messageContent\n                }\n            ],\n            response_format: {\n                type: \"json_object\"\n            },\n            max_tokens: 1500\n        });\n        const content = completion.choices[0].message.content;\n        if (!content) throw new Error(\"Empty response from OpenAI\");\n        const jsonResult = JSON.parse(content);\n        return next_server__WEBPACK_IMPORTED_MODULE_0__.NextResponse.json(jsonResult);\n    } catch (error) {\n        console.error(\"Image Analysis Error:\", error);\n        return next_server__WEBPACK_IMPORTED_MODULE_0__.NextResponse.json({\n            error: \"이미지 분석 실패: 다시 붙여넣거나 상품정보를 직접 입력해 주세요\"\n        }, {\n            status: 500\n        });\n    }\n}\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9zcmMvYXBwL2FwaS9hbmFseXplLWltYWdlL3JvdXRlLnRzIiwibWFwcGluZ3MiOiI7Ozs7OztBQUEyQztBQUNmO0FBRTVCLE1BQU1FLGdCQUFnQixDQUFDOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFpQ3ZCLENBQUM7QUFFTSxlQUFlQyxLQUFLQyxHQUFZO0lBQ3JDLElBQUk7UUFDRixNQUFNLEVBQUVDLE1BQU0sRUFBRSxHQUFHLE1BQU1ELElBQUlFLElBQUksSUFBSSw0QkFBNEI7UUFFakUsSUFBSSxDQUFDRCxVQUFVLENBQUNFLE1BQU1DLE9BQU8sQ0FBQ0gsV0FBV0EsT0FBT0ksTUFBTSxLQUFLLEdBQUc7WUFDNUQsT0FBT1QscURBQVlBLENBQUNNLElBQUksQ0FBQztnQkFBRUksT0FBTztZQUFtQixHQUFHO2dCQUFFQyxRQUFRO1lBQUk7UUFDeEU7UUFFQSxNQUFNQyxTQUFTQyxRQUFRQyxHQUFHLENBQUNDLGNBQWM7UUFDekMsSUFBSSxDQUFDSCxRQUFRO1lBQ1gsTUFBTUksYUFBYSxDQUFDLGlFQUFpRSxFQUFFWCxPQUFPSSxNQUFNLENBQUMsaUJBQWlCLENBQUM7WUFDdkgsT0FBT1QscURBQVlBLENBQUNNLElBQUksQ0FBQztnQkFBRVcsVUFBVUQ7WUFBVztRQUNsRDtRQUVBLE1BQU1FLFNBQVMsSUFBSWpCLDhDQUFNQSxDQUFDO1lBQUVXO1FBQU87UUFDbkMsTUFBTU8sWUFBWU4sUUFBUUMsR0FBRyxDQUFDTSxZQUFZLElBQUk7UUFFOUMsTUFBTUMsaUJBQXdCO1lBQzVCO2dCQUFFQyxNQUFNO2dCQUFRQyxNQUFNO1lBQXlCO1NBQ2hEO1FBRUQsS0FBSyxNQUFNQyxhQUFhbkIsT0FBUTtZQUM5QmdCLGVBQWVJLElBQUksQ0FBQztnQkFDbEJILE1BQU07Z0JBQ05JLFdBQVc7b0JBQUVDLEtBQUtIO29CQUFXSSxRQUFRO2dCQUFPO1lBQzlDO1FBQ0Y7UUFFQSxNQUFNQyxhQUFhLE1BQU1YLE9BQU9ZLElBQUksQ0FBQ0MsV0FBVyxDQUFDQyxNQUFNLENBQUM7WUFDdERDLE9BQU9kO1lBQ1BlLFVBQVU7Z0JBQ1I7b0JBQUVDLE1BQU07b0JBQVVDLFNBQVNsQztnQkFBYztnQkFDekM7b0JBQUVpQyxNQUFNO29CQUFRQyxTQUFTZjtnQkFBZTthQUN6QztZQUNEZ0IsaUJBQWlCO2dCQUFFZixNQUFNO1lBQWM7WUFDdkNnQixZQUFZO1FBQ2Q7UUFFQSxNQUFNRixVQUFVUCxXQUFXVSxPQUFPLENBQUMsRUFBRSxDQUFDQyxPQUFPLENBQUNKLE9BQU87UUFDckQsSUFBSSxDQUFDQSxTQUFTLE1BQU0sSUFBSUssTUFBTTtRQUU5QixNQUFNQyxhQUFhQyxLQUFLQyxLQUFLLENBQUNSO1FBQzlCLE9BQU9wQyxxREFBWUEsQ0FBQ00sSUFBSSxDQUFDb0M7SUFFM0IsRUFBRSxPQUFPaEMsT0FBTztRQUNkbUMsUUFBUW5DLEtBQUssQ0FBQyx5QkFBeUJBO1FBQ3ZDLE9BQU9WLHFEQUFZQSxDQUFDTSxJQUFJLENBQUM7WUFBRUksT0FBTztRQUF1QyxHQUFHO1lBQUVDLFFBQVE7UUFBSTtJQUM1RjtBQUNGIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vc2VsbGVyLWFpLWNzLy4vc3JjL2FwcC9hcGkvYW5hbHl6ZS1pbWFnZS9yb3V0ZS50cz9jMmE1Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IE5leHRSZXNwb25zZSB9IGZyb20gJ25leHQvc2VydmVyJztcbmltcG9ydCBPcGVuQUkgZnJvbSAnb3BlbmFpJztcblxuY29uc3QgU1lTVEVNX1BST01QVCA9IGBcbuuLueyLoOydgCDsmKjrnbzsnbgg7Luk66i47IqkIOyDgeyEuO2OmOydtOyngCDsnbTrr7jsp4Ag67aE7ISdIOyghOusuOqwgOyeheuLiOuLpC5cbuyjvOyWtOynhCDtlZjrgpgg65iQ64qUIOyXrOufrCDsnqXsnZgg7J2066+47KeA66W8IOu2hOyEne2VmOyXrCDslYTrnpgg7ZW17IusIENTIO2VreuqqeydhCDstpTstpztlbTso7zshLjsmpQuXG5cblvstpTstpwg7ZWt66qpXVxuLSDsg4HtkojrqoVcbi0g7IOB7ZKIIOyiheulmFxuLSDshozsnqxcbi0g7IKs7J207KaIXG4tIOyDieyDgVxuLSDqtazshLHtkohcbi0g66y06rKMXG4tIOyCrOyaqSDsmqnrj4Rcbi0g7J247KadL0tDL0tGL+yLnO2XmOyEseyggeyEnCDsl6zrtoBcbi0g7KO87J2Y7IKs7ZWtXG4tIOygnOyhsOq1rVxuLSDshLjtg4HrsKnrspVcbi0g7YyQ66ek7J6Q6rCAIO2ZleyduO2VtOyVvCDtlaAg7KCV67O0ICjtirnsnbTsgqztla0pXG5cblvtlbXsi6wg7JuQ7LmZXVxuMS4g7J2066+47KeAIOuCtCDtkZwoVGFibGUp67+Q66eMIOyVhOuLiOudvCDshJzsiKDtmJUg66y47J6lKOyYiDogXCJ+7IaM7J6s7J6F64uI64ukXCIsIFwifuuhnCDsoJzsnpHrkJjsl4jsirXri4jri6RcIiwgXCJ+7Zi87Jqp7J6F64uI64ukXCIsIFwifuq2jOyepe2VqeuLiOuLpFwiIOuTsSnsl5DshJzrj4QgJ+yGjOyerCcsICfshLjtg4HrsKnrspUnLCAn6rWs7ISx7ZKIJywgJ+yCrOydtOymiCcsICfso7zsnZjsgqztla0nIOuTseydmCDtlbXsi6wg7Iqk7Y6ZIOygleuztOulvCDsoIHqt7nsoIHsnLzroZwg7LC+7JWE64K0IOy2lOy2nO2VoCDqsoMuXG4yLiDshJzsiKDtmJUg66y47J6l7J20652864+EIOyKpO2OmeydtCDrqoXtmZXtlZjri6TrqbQg6rWs7KGw7ZmU7ZWY7JesIO2RnOyLnO2VoCDqsoMuICjsmIg6IFwi7Y+066as7JeQ7Iqk7YSwIDEwMCUg7IaM7J6s7J6F64uI64ukXCIgLT4gXCLshozsnqw6IO2PtOumrOyXkOyKpO2EsCAxMDAlIFvsnbTrr7jsp4Dsl5DshJwg7ZmV7J2465CoXVwiKVxuMy4g7J2066+47KeA7JeQ7IScIOq4gOyekOuhnCDsp4HsoJEg7ZmV7J2465CcIOygleuztOyZgCBBSeqwgCDtmJXtg5zrgpgg7KCV7Zmp7IOBIOy2lOygle2VnCDsoJXrs7Trpbwg67CY65Oc7IucIOuqhe2Zle2VmOqyjCDqtazrtoTtlbTshJwg7J6R7ISx7ZWgIOqygy5cbiAgIC0g7JiIOiDshozsnqw6IOuptCAxMDAlIFvsnbTrr7jsp4Dsl5DshJwg7ZmV7J2465CoXVxuICAgLSDsmIg6IOyCrOyaqSDsmqnrj4Q6IOyVvOyZuCDsiqTtj6zsuKDsmqkgW0FJIOy2lOyglV1cbjQuIOydtOuvuOyngCDrgrTsl5DshJwg7KCE7ZiAIOuLqOyEnOulvCDssL7snYQg7IiYIOyXhuuKlCDtla3rqqnsnYAg7KeA7Ja064K07KeAIOunkOqzoCDrsJjrk5zsi5wgXCLsnbTrr7jsp4Ag64K0IO2ZleyduOuQmOyngCDslYrsnYxcIuycvOuhnCDtkZzquLDtlaAg6rKDLlxuNS4g67O06riwIOyii+qyjCDrtojrpr8g7Y+s7J247Yq4KC0pIO2Yle2DnOuhnCDquZTrgZTtlZjqsowg7KCV66as7ZWgIOqygy5cblxuW+y2nOugpSDtmJXsi51dXG7rsJjrk5zsi5wg7JWE656YIEpTT04g7ZiV7Iud7Jy866Gc66eMIOydkeuLte2VmOyEuOyalC5cbntcbiAgXCJpbmZvVGV4dFwiOiBcIuu2hOyEneuQnCDsg4Htkogg7KCV67O0IO2FjeyKpO2KuFwiXG59XG5gO1xuXG5leHBvcnQgYXN5bmMgZnVuY3Rpb24gUE9TVChyZXE6IFJlcXVlc3QpIHtcbiAgdHJ5IHtcbiAgICBjb25zdCB7IGltYWdlcyB9ID0gYXdhaXQgcmVxLmpzb24oKTsgLy8gQXJyYXkgb2YgYmFzZTY0IGRhdGEgVVJMc1xuXG4gICAgaWYgKCFpbWFnZXMgfHwgIUFycmF5LmlzQXJyYXkoaW1hZ2VzKSB8fCBpbWFnZXMubGVuZ3RoID09PSAwKSB7XG4gICAgICByZXR1cm4gTmV4dFJlc3BvbnNlLmpzb24oeyBlcnJvcjogJ+ydtOuvuOyngOqwgCDsoJzqs7XrkJjsp4Ag7JWK7JWY7Iq164uI64ukLicgfSwgeyBzdGF0dXM6IDQwMCB9KTtcbiAgICB9XG5cbiAgICBjb25zdCBhcGlLZXkgPSBwcm9jZXNzLmVudi5PUEVOQUlfQVBJX0tFWTtcbiAgICBpZiAoIWFwaUtleSkge1xuICAgICAgY29uc3QgbW9ja1Jlc3VsdCA9IGBb7J2066+47KeAIOyekOuPmSDrtoTshJ0gKE1vY2spXVxcbkFQSSDtgqTqsIAg7ISk7KCV65CY7KeAIOyViuyVhCDsi6TsoJwgVmlzaW9uIOu2hOyEneydgCDsp4TtlonrkJjsp4Ag7JWK7JWY7Iq164uI64ukLlxcbijstJ0gJHtpbWFnZXMubGVuZ3RofeyepeydmCDsnbTrr7jsp4DqsIAg7IiY7Iug65CY7JeI7Iq164uI64ukLilgO1xuICAgICAgcmV0dXJuIE5leHRSZXNwb25zZS5qc29uKHsgaW5mb1RleHQ6IG1vY2tSZXN1bHQgfSk7XG4gICAgfVxuXG4gICAgY29uc3Qgb3BlbmFpID0gbmV3IE9wZW5BSSh7IGFwaUtleSB9KTtcbiAgICBjb25zdCBtb2RlbE5hbWUgPSBwcm9jZXNzLmVudi5PUEVOQUlfTU9ERUwgfHwgJ2dwdC00by1taW5pJztcblxuICAgIGNvbnN0IG1lc3NhZ2VDb250ZW50OiBhbnlbXSA9IFtcbiAgICAgIHsgdHlwZTogJ3RleHQnLCB0ZXh0OiAn7LKo67aA65CcIOyDgeyEuO2OmOydtOyngCDsnbTrr7jsp4Drpbwg67aE7ISd7ZW07KO87IS47JqULicgfVxuICAgIF07XG5cbiAgICBmb3IgKGNvbnN0IGltZ0Jhc2U2NCBvZiBpbWFnZXMpIHtcbiAgICAgIG1lc3NhZ2VDb250ZW50LnB1c2goe1xuICAgICAgICB0eXBlOiAnaW1hZ2VfdXJsJyxcbiAgICAgICAgaW1hZ2VfdXJsOiB7IHVybDogaW1nQmFzZTY0LCBkZXRhaWw6ICdhdXRvJyB9XG4gICAgICB9KTtcbiAgICB9XG5cbiAgICBjb25zdCBjb21wbGV0aW9uID0gYXdhaXQgb3BlbmFpLmNoYXQuY29tcGxldGlvbnMuY3JlYXRlKHtcbiAgICAgIG1vZGVsOiBtb2RlbE5hbWUsXG4gICAgICBtZXNzYWdlczogW1xuICAgICAgICB7IHJvbGU6ICdzeXN0ZW0nLCBjb250ZW50OiBTWVNURU1fUFJPTVBUIH0sXG4gICAgICAgIHsgcm9sZTogJ3VzZXInLCBjb250ZW50OiBtZXNzYWdlQ29udGVudCB9XG4gICAgICBdLFxuICAgICAgcmVzcG9uc2VfZm9ybWF0OiB7IHR5cGU6ICdqc29uX29iamVjdCcgfSxcbiAgICAgIG1heF90b2tlbnM6IDE1MDAsXG4gICAgfSk7XG5cbiAgICBjb25zdCBjb250ZW50ID0gY29tcGxldGlvbi5jaG9pY2VzWzBdLm1lc3NhZ2UuY29udGVudDtcbiAgICBpZiAoIWNvbnRlbnQpIHRocm93IG5ldyBFcnJvcihcIkVtcHR5IHJlc3BvbnNlIGZyb20gT3BlbkFJXCIpO1xuXG4gICAgY29uc3QganNvblJlc3VsdCA9IEpTT04ucGFyc2UoY29udGVudCk7XG4gICAgcmV0dXJuIE5leHRSZXNwb25zZS5qc29uKGpzb25SZXN1bHQpO1xuXG4gIH0gY2F0Y2ggKGVycm9yKSB7XG4gICAgY29uc29sZS5lcnJvcignSW1hZ2UgQW5hbHlzaXMgRXJyb3I6JywgZXJyb3IpO1xuICAgIHJldHVybiBOZXh0UmVzcG9uc2UuanNvbih7IGVycm9yOiAn7J2066+47KeAIOu2hOyEnSDsi6TtjKg6IOuLpOyLnCDrtpnsl6zrhKPqsbDrgpgg7IOB7ZKI7KCV67O066W8IOyngeygkSDsnoXroKXtlbQg7KO87IS47JqUJyB9LCB7IHN0YXR1czogNTAwIH0pO1xuICB9XG59XG4iXSwibmFtZXMiOlsiTmV4dFJlc3BvbnNlIiwiT3BlbkFJIiwiU1lTVEVNX1BST01QVCIsIlBPU1QiLCJyZXEiLCJpbWFnZXMiLCJqc29uIiwiQXJyYXkiLCJpc0FycmF5IiwibGVuZ3RoIiwiZXJyb3IiLCJzdGF0dXMiLCJhcGlLZXkiLCJwcm9jZXNzIiwiZW52IiwiT1BFTkFJX0FQSV9LRVkiLCJtb2NrUmVzdWx0IiwiaW5mb1RleHQiLCJvcGVuYWkiLCJtb2RlbE5hbWUiLCJPUEVOQUlfTU9ERUwiLCJtZXNzYWdlQ29udGVudCIsInR5cGUiLCJ0ZXh0IiwiaW1nQmFzZTY0IiwicHVzaCIsImltYWdlX3VybCIsInVybCIsImRldGFpbCIsImNvbXBsZXRpb24iLCJjaGF0IiwiY29tcGxldGlvbnMiLCJjcmVhdGUiLCJtb2RlbCIsIm1lc3NhZ2VzIiwicm9sZSIsImNvbnRlbnQiLCJyZXNwb25zZV9mb3JtYXQiLCJtYXhfdG9rZW5zIiwiY2hvaWNlcyIsIm1lc3NhZ2UiLCJFcnJvciIsImpzb25SZXN1bHQiLCJKU09OIiwicGFyc2UiLCJjb25zb2xlIl0sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(rsc)/./src/app/api/analyze-image/route.ts\n");
-
-/***/ })
-
-};
-;
-
-// load runtime
-var __webpack_require__ = require("../../../webpack-runtime.js");
-__webpack_require__.C(exports);
-var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
-var __webpack_exports__ = __webpack_require__.X(0, ["vendor-chunks/next","vendor-chunks/formdata-node","vendor-chunks/openai","vendor-chunks/tr46","vendor-chunks/web-streams-polyfill","vendor-chunks/node-fetch","vendor-chunks/whatwg-url","vendor-chunks/event-target-shim","vendor-chunks/agentkeepalive","vendor-chunks/form-data-encoder","vendor-chunks/webidl-conversions","vendor-chunks/abort-controller","vendor-chunks/ms","vendor-chunks/humanize-ms"], () => (__webpack_exec__("(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader.js?name=app%2Fapi%2Fanalyze-image%2Froute&page=%2Fapi%2Fanalyze-image%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fanalyze-image%2Froute.ts&appDir=C%3A%5CUsers%5CUSER%5C%EC%B4%88%EB%B3%B4%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%5Cconnect-ai%5Cseller-ai-cs%5Csrc%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CUSER%5C%EC%B4%88%EB%B3%B4%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%5Cconnect-ai%5Cseller-ai-cs&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D!")));
-module.exports = __webpack_exports__;
-
-})();
+[출력 JSON 형식]
+반드시 아래 키 명칭만 사용하는 단일 JSON 객체로만 응답하세요. 다른 마크다운이나 부가 설명은 일체 배제하십시오.
+{
+  "infoText": "[이미지 분석 보완 정보]\\n- 이미지에서 확인된 옵션별 사이즈:\\n  \xb7 소형: 폭 90 x 길이 190 x 높이 140cm [신뢰도: 중간]\\n- 이미지에서 확인된 색상: 이미지에서 명확히 확인되지 않음\\n- 이미지에서 확인된 구성/옵션: 이미지에서 명확히 확인되지 않음\\n- 이미지에서 확인된 주의사항: 세탁 시 30도 이하에서 세탁 [신뢰도: 중간]\\n- 이미지에서 확인된 Fabric/소재/혼용률: 비스코스 50%, 폴리에스터 34%, 나일론 10%, 울 6% [신뢰도: 중간]\\n- 이미지에서 확인된 Laundry/세탁 안내: 30도 이하 세탁 [신뢰도: 중간]"
+}
+`;async function m(e,t){try{let r=e.split(",")[1]||e,i=Buffer.from(r,"base64"),s=c()(i),n=await s.metadata(),a=n.width||0,o=n.height||0;if(console.log(`[analyze-image split] Original image dimensions: ${a}x${o}`),a>0&&o>=2500){let e=[],r=0,i=0;for(;r<o&&i<4;){let n=Math.min(1500,o-r),l=(await s.clone().extract({left:0,top:r,width:a,height:n}).toBuffer()).toString("base64");e.push({base64Data:`data:${t};base64,${l}`,mimeType:t}),r+=n,i++}return console.log(`[analyze-image split] Successfully split image into ${e.length} pieces.`),e}}catch(e){console.warn("[analyze-image split] sharp partition error, using original single image:",e)}return[{base64Data:e,mimeType:t}]}async function d(e){let t=e.trim();t.startsWith("//")&&(t=`https:${t}`);let r=[];t.startsWith("http://")&&r.push(t.replace("http://","https://")),r.push(t);let i=null;for(let e of r){let t=new AbortController,r=setTimeout(()=>t.abort(),5e3);try{let i=new URL(e),s=await fetch(e,{signal:t.signal,headers:{"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",Accept:"image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",Referer:i.origin}});if(clearTimeout(r),!s.ok)throw Error(`HTTP_${s.status}`);let n=s.headers.get("content-type")?.trim()||"";if(!n)throw Error("이미지 분석 실패: 유효한 이미지 응답이 아닙니다. (MIME type이 비어있음)");let a=n.toLowerCase();if(a.includes("text/html"))throw Error("이미지 분석 실패: 외부 서버가 이미지 대신 HTML을 반환했습니다.");if(a.includes("application/json"))throw Error("이미지 분석 실패: 외부 서버가 이미지 대신 JSON을 반환했습니다.");if(a.includes("text/plain"))throw Error("이미지 분석 실패: 외부 서버가 이미지 대신 텍스트를 반환했습니다.");if(a.includes("application/octet-stream"))throw Error("이미지 분석 실패: 이미지 파일이 아닙니다. MIME type: application/octet-stream");if(!["image/jpeg","image/jpg","image/png","image/webp","image/gif"].some(e=>a.startsWith(e)||a.includes(e)))throw Error(`이미지 분석 실패: 이미지 파일이 아닙니다. MIME type: ${n}`);let o=await s.arrayBuffer();if(0===o.byteLength||o.byteLength<100)throw Error("이미지 분석 실패: 유효한 이미지 응답이 아닙니다. (파일 크기가 너무 작거나 비어있습니다)");let l=Buffer.from(o.slice(0,Math.min(o.byteLength,1e3))).toString("utf8").trim().toLowerCase();if(l.startsWith("<!doctype html>")||l.startsWith("<html")||l.includes("<script")||l.includes("<!doctype"))throw Error("이미지 분석 실패: 외부 서버가 이미지 대신 HTML을 반환했습니다.");let u=Buffer.from(o).toString("base64");return{base64Data:`data:${n};base64,${u}`,mimeType:n}}catch(e){if(clearTimeout(r),i=e,e.message&&e.message.startsWith("이미지 분석 실패"))throw e}}let s=i?.message||"";if(s.startsWith("이미지 분석 실패"))throw i;if(s.includes("HTTP_403"))throw Error("외부 서버 차단 (403 Forbidden)");if(s.includes("HTTP_404"))throw Error("이미지 다운로드 실패 (404 Not Found)");if(i?.name==="AbortError")throw Error("다운로드 시간 초과 (Timeout)");throw Error(`이미지 접근 실패: ${s||"연결 오류"}`)}async function f(e){let t,r,i=!1;try{let{images:s,imageUrl:n}=await e.json();if(r=n,t=n,(!s||!Array.isArray(s)||0===s.length)&&!n)return o.NextResponse.json({error:"이미지가 제공되지 않았습니다."},{status:400});let a=process.env.OPENAI_API_KEY,u=(n||"").toLowerCase(),c=u.includes("picsum")||u.includes("acacia")||u.includes("board"),f=u.includes("dht-b2b.com")||u.includes("dht")||u.includes("cafe24")||u.includes("web/upload")&&!u.includes("domeggook");if(console.log("[analyze-image debug]",{imageUrl:n,hasApiKey:!!process.env.OPENAI_API_KEY,isMockTarget:c||f,includesDht:u.includes("dht"),includesDhtB2b:u.includes("dht-b2b.com"),includesCafe24:u.includes("cafe24"),includesWebUpload:u.includes("web/upload"),isDomeggook:u.includes("domeggook")}),!a){let e="";return e=f||c?"[이미지 분석 보완 정보]\n- 이미지에서 확인된 옵션별 사이즈:\n  \xb7 소형: 폭 90 x 길이 190 x 높이 140cm [신뢰도: 중간]\n  \xb7 1인용: 폭 100 x 길이 195 x 높이 130cm [신뢰도: 중간]\n  \xb7 2인용: 폭 120 x 길이 200 x 높이 150cm [신뢰도: 중간]\n  \xb7 3인 이상: 폭 150 x 길이 200 x 높이 150cm [신뢰도: 중간]\n  \xb7 4인 이상: 이미지에서 일부만 확인됨\n- 이미지에서 확인된 색상: 이미지에서 명확히 확인되지 않음\n- 이미지에서 확인된 구성/옵션: 소형, 1인용, 2인용, 3인 이상 옵션 확인 [신뢰도: 중간]\n- 이미지에서 확인된 주의사항: 소형은 폭 90cm로 1인 침대 등 협소한 장소에서 사용 문구 확인 [신뢰도: 중간]":"[이미지 분석 보완 정보]\n- 이미지에서 확인된 옵션별 사이즈: 이미지에서 명확히 확인되지 않음\n- 이미지에서 확인된 색상: 이미지에서 명확히 확인되지 않음\n- 이미지에서 확인된 구성/옵션: 이미지에서 명확히 확인되지 않음\n- 이미지에서 확인된 주의사항: 이미지에서 명확히 확인되지 않음",o.NextResponse.json({infoText:e,mockMode:!0,analysisSource:"mock"})}let g=[];if(n)try{let{base64Data:e,mimeType:t}=await d(n);g=await m(e,t)}catch(r){let e=r.message||"";if(e.startsWith("이미지 분석 실패"))return console.error("[analyze-image] prefetch blocked with clear format error:",r),o.NextResponse.json({error:e,code:"IMAGE_VALIDATION_FAILED"},{status:400});console.warn("[analyze-image] prefetch failed, fallback to direct imageUrl:",r),t=n,i=!0}let h=new l.ZP({apiKey:a}),y=process.env.OPENAI_MODEL||"gpt-4o-mini",x="";if(n&&!i&&g.length>0){console.log(`[analyze-image] Starting parallel OCR for ${g.length} chunks.`);let e=g.map(async(e,t)=>{try{let r=(await h.chat.completions.create({model:y,messages:[{role:"system",content:p},{role:"user",content:[{type:"text",text:`상세 이미지 분할 조각 ${t+1}을 정밀 분석해 주세요.`},{type:"image_url",image_url:{url:e.base64Data,detail:"high"}}]}],response_format:{type:"json_object"},max_tokens:1e3})).choices[0].message.content;if(!r)return null;return JSON.parse(r)}catch(e){return console.warn(`[analyze-image chunk ${t+1}] Vision API call failed:`,e),null}}),t=(await Promise.all(e)).filter(e=>null!==e&&"string"==typeof e.infoText);if(0===t.length)throw Error("모든 분할 이미지 조각의 Vision 분석에 실패했습니다.");x=function(e){let t=new Map,r=new Set,i=new Set,s=new Set,n=new Set,a=new Set,o=e=>e.includes("확인되지 않음")||e.includes("확인 필요")||e.includes("일부만 확인됨");for(let l of e){let e=l.split("\n"),u=null;for(let l of e){let e=l.trim();if(e.includes("확인된 옵션별 사이즈")){u="sizes";continue}if(e.includes("확인된 색상")){u="colors";let t=e.substring(e.indexOf(":")+1).trim();t&&!o(t)&&i.add(t);continue}if(e.includes("확인된 구성/옵션")){u="options";let t=e.substring(e.indexOf(":")+1).trim();t&&!o(t)&&s.add(t);continue}if(e.includes("확인된 주의사항")){u="cautions";let t=e.substring(e.indexOf(":")+1).trim();t&&!o(t)&&r.add(t);continue}else if(e.includes("확인된 Fabric/소재/혼용률")){u="fabrics";let t=e.substring(e.indexOf(":")+1).trim();t&&!o(t)&&n.add(t);continue}else if(e.includes("확인된 Laundry/세탁 안내")){u="laundries";let t=e.substring(e.indexOf(":")+1).trim();t&&!o(t)&&a.add(t);continue}if("sizes"===u&&e.startsWith("\xb7")){let r=e.substring(1).trim(),i=r.indexOf(":");if(-1!==i){let e=r.substring(0,i).trim(),s=r.substring(i+1).trim(),n=t.get(e);(!n||o(n)&&!o(s))&&t.set(e,`  \xb7 ${e}: ${s}`)}}}}let l=["[이미지 분석 보완 정보]","- 이미지에서 확인된 옵션별 사이즈:"];t.size>0?Array.from(t.keys()).forEach(e=>{l.push(t.get(e))}):l.push("  \xb7 이미지에서 명확히 확인되지 않음");let u=i.size>0?Array.from(i).join(", "):"이미지에서 명확히 확인되지 않음";l.push(`- 이미지에서 확인된 색상: ${u}`);let c=s.size>0?Array.from(s).join(", "):"이미지에서 명확히 확인되지 않음";l.push(`- 이미지에서 확인된 구성/옵션: ${c}`);let p=r.size>0?Array.from(r).join(", "):"이미지에서 명확히 확인되지 않음";l.push(`- 이미지에서 확인된 주의사항: ${p}`);let m=n.size>0?Array.from(n).join(", "):"이미지에서 명확히 확인되지 않음";l.push(`- 이미지에서 확인된 Fabric/소재/혼용률: ${m}`);let d=a.size>0?Array.from(a).join(", "):"이미지에서 명확히 확인되지 않음";return l.push(`- 이미지에서 확인된 Laundry/세탁 안내: ${d}`),l.join("\n")}(t.map(e=>e.infoText))}else{let e=[{type:"text",text:"첨부된 상세페이지 이미지를 분석해주세요."}];if(n)e.push({type:"image_url",image_url:{url:t||n,detail:"high"}});else if(s&&Array.isArray(s))for(let t of s)e.push({type:"image_url",image_url:{url:t,detail:"high"}});let r=(await h.chat.completions.create({model:y,messages:[{role:"system",content:p},{role:"user",content:e}],response_format:{type:"json_object"},max_tokens:1500})).choices[0].message.content;if(!r)throw Error("Empty response from OpenAI");x=JSON.parse(r).infoText||""}return o.NextResponse.json({infoText:x,mockMode:!1,analysisSource:"openai"})}catch(e){if(console.error("Image Analysis Error:",e),r&&i)return o.NextResponse.json({error:`이미지 후보는 정상 수집되었지만, 분석용 이미지 다운로드가 실패했습니다. 외부 이미지 서버가 접근을 제한했을 수 있습니다. (상세: ${e.message||"Vision API 통신 오류"})`,code:"IMAGE_DOWNLOAD_FAILED"},{status:400});return o.NextResponse.json({error:`Vision 분석 실패: ${e.message||"다시 시도해 주세요"}`,code:"VISION_ANALYSIS_FAILED"},{status:500})}}let g=new s.AppRouteRouteModule({definition:{kind:n.x.APP_ROUTE,page:"/api/analyze-image/route",pathname:"/api/analyze-image",filename:"route",bundlePath:"app/api/analyze-image/route"},resolvedPagePath:"D:\\초보프로젝트\\connect-ai\\seller-ai-cs\\src\\app\\api\\analyze-image\\route.ts",nextConfigOutput:"",userland:i}),{requestAsyncStorage:h,staticGenerationAsyncStorage:y,serverHooks:x}=g,b="/api/analyze-image/route";function w(){return(0,a.patchFetch)({serverHooks:x,staticGenerationAsyncStorage:y})}}};var t=require("../../../webpack-runtime.js");t.C(e);var r=e=>t(t.s=e),i=t.X(0,[948,972,214],()=>r(1570));module.exports=i})();
