@@ -362,37 +362,93 @@ async function runBackgroundTask(
             item.infoText = resData.infoText || resData.productInfo || '';
             item.imageCandidates = resData.imageCandidates || [];
 
-            // 누락 필수 스펙 항목 자율 추출 및 구조화 (v1.0-B)
-            const missingList: string[] = [];
+            // --- 상품 유형 분류 및 고도화 필터링 (v1.0-F) ---
+            const combinedText = (item.productName + " " + (resData.infoText || resData.productInfo || '')).toLowerCase();
+            let category = '일반/기타';
+            if (/의류|티셔츠|바지|원피스|셔츠|자켓|점퍼|양말|신발|패션|맨투맨/i.test(combinedText)) category = '의류';
+            else if (/주방|도마|컵|텀블러|식기|조리도구|밀폐용기|서빙보드|수저/i.test(combinedText)) category = '주방용품';
+            else if (/가전|콘센트|충전기|조명|모터|led|멀티탭|어댑터|전기|온열|발열/i.test(combinedText)) category = '전기/가전';
+            else if (/아동|키즈|장난감|유아|어린이|토이/i.test(combinedText)) category = '어린이/유아';
+            else if (/가구|책상|의자|선반|수납장|침대|행거/i.test(combinedText)) category = '가구/수납';
+            else if (/텐트|매트|운동기구|캠핑|헬스|스포츠|야외/i.test(combinedText)) category = '스포츠/캠핑';
+
+            // 카테고리별 제외 키워드
+            let excludeKws: string[] = [];
+            if (category === '의류') excludeKws = ['식품', '하중', '전압', '소비전력', '방수', '어린이', 'kc', '시험성적서'];
+            else if (category === '주방용품') excludeKws = ['세탁', '하중', '전압', '소비전력'];
+            else if (category === '전기/가전') excludeKws = ['세탁', '식품', '하중'];
+            else if (category === '어린이/유아') excludeKws = ['식품', '전압', '소비전력'];
+            else if (category === '가구/수납') excludeKws = ['식품', '세탁', '전압', '소비전력'];
+            else if (category === '스포츠/캠핑') excludeKws = ['식품', '전압', '소비전력'];
+
+            // 민감 항목 복구 키워드
+            const restoreKws: string[] = [];
+            if (/아동|키즈|유아|어린이/i.test(combinedText)) restoreKws.push('어린이', 'kc');
+            if (/방수|생활방수|야외|캠핑/i.test(combinedText)) restoreKws.push('방수', '내구성');
+            if (/선반|행거|수납|의자|캠핑의자/i.test(combinedText)) restoreKws.push('하중', '내하중');
+            if (/전기|온열|발열|충전|led/i.test(combinedText)) restoreKws.push('kc', '전기', '전압', '소비전력');
+            if (/주방|식기|컵|용기|조리/i.test(combinedText)) restoreKws.push('식품');
+
+            // 누락 필수 스펙 항목 자율 추출 및 구조화 (v1.0-F)
+            const rawMissingList: string[] = [];
+            const foundCoreFields: string[] = [];
             const absenceKeywords = ["명시 없음", "확인되지 않음", "제공 여부 확인 필요", "상세페이지 내 명시 없음", "확인 필요", "별도 표기 없음", "미확인"];
             const infoTextVal = resData.infoText || resData.productInfo || '';
+            const coreKeywords = ['상품명', '색상', '옵션', '사이즈', '규격', '크기', '소재', '재질', '배송', '출고'];
             
             infoTextVal.split('\n').forEach((line: string) => {
               if (line.includes(':')) {
-                const val = line.substring(line.indexOf(':') + 1);
-                if (absenceKeywords.some(kw => val.includes(kw))) {
-                  const fieldName = line.substring(0, line.indexOf(':')).replace(/^-\s*/, '').trim();
-                  missingList.push(fieldName);
+                const keyPart = line.substring(0, line.indexOf(':')).replace(/^-\s*/, '').trim();
+                const valPart = line.substring(line.indexOf(':') + 1);
+                
+                const isMissing = absenceKeywords.some(kw => valPart.includes(kw));
+                if (isMissing) {
+                  rawMissingList.push(keyPart);
+                } else {
+                  if (coreKeywords.some(ck => keyPart.includes(ck))) {
+                    foundCoreFields.push(keyPart);
+                  }
                 }
               }
             });
-            item.missingRequiredFields = missingList;
 
-            // 수명주기 6단계 상태 정밀 평가
+            // 필터링 적용
+            const missingList = rawMissingList.filter(missingField => {
+              const lowerField = missingField.toLowerCase();
+              let isIrrelevant = excludeKws.some(ex => lowerField.includes(ex));
+              let isRestored = restoreKws.some(res => lowerField.includes(res));
+              return !isIrrelevant || isRestored; // 무관하지 않거나, 다시 복구된 경우에만 남김
+            });
+
+            const irrelevantExcludedList = rawMissingList.filter(x => !missingList.includes(x));
+
+            item.missingRequiredFields = missingList;
+            (item as any).category = category;
+            (item as any).irrelevantExcluded = irrelevantExcludedList;
+
+            // 수명주기 6단계 상태 정밀 평가 (고도화 기준)
+            const filteredUnknowns = missingList.length;
+            const coreMetCount = foundCoreFields.length;
+
             if (qualityScore < 70) {
               item.status = 'CHECK_REQUIRED';
               checkRequiredCount++;
-              const displayMissing = missingList.slice(0, 3).join(', ');
-              item.reason = `품질 점수 미달 (${qualityScore}점)${displayMissing ? ` (누락: ${displayMissing}${missingList.length > 3 ? ' 외' : ''})` : ''}`;
-            } else if (unknowns >= 3) {
+              item.reason = `${category} 상품으로 판단됨 / 품질 점수 미달 (${qualityScore}점) / 자동 답변 불가 / 판매자 검수 필요`;
+            } else if (restoreKws.some(kw => missingList.some(m => m.toLowerCase().includes(kw)))) {
+              // 민감 항목이 누락된 경우 강제 CHECK_REQUIRED
+              item.status = 'CHECK_REQUIRED';
+              checkRequiredCount++;
+              const sensitiveMissings = missingList.filter(m => restoreKws.some(kw => m.toLowerCase().includes(kw)));
+              item.reason = `${category} 상품으로 판단됨 / 민감 스펙 누락 확인 필요: ${sensitiveMissings.join(', ')} / 자동 답변 불가 / 판매자 보완 권장`;
+            } else if (filteredUnknowns >= 2 || coreMetCount < 3) {
               item.status = 'INSUFFICIENT';
               insufficientCount++;
-              const displayMissing = missingList.slice(0, 4).join(', ');
-              item.reason = `필수 고시/스펙 부족${displayMissing ? ` (누락: ${displayMissing}${missingList.length > 4 ? ' 외' : ''})` : ''}`;
+              const displayMissing = missingList.slice(0, 3).join(', ');
+              item.reason = `${category} 상품으로 판단됨 / 핵심 정보 일부 부족${displayMissing ? `: ${displayMissing}` : ''} / 자동 답변 가능: 부분 가능 / 판매자 보완 권장`;
             } else {
               item.status = 'SUCCESS';
-              item.reason = missingList.length > 0 ? `일부 미비: ${missingList.slice(0, 3).join(', ')}` : '필수 스펙 확보 완료';
               successCount++;
+              item.reason = `${category} 상품으로 판단됨 / 핵심 정보 충족 (${coreMetCount}개 이상) / 자동 답변 가능: 완전 가능`;
             }
           } else {
             item.status = 'FAILED';
@@ -447,17 +503,23 @@ async function runBackgroundTask(
       ``
     ];
 
-    // 정보부족 / 검수필요 상품의 누락 항목 요약 추가 (v1.0-B)
+    // 정보부족 / 검수필요 상품의 누락 항목 요약 추가 (v1.0-F)
     const issueItems = queueItems.filter(x => x.status === 'INSUFFICIENT' || x.status === 'CHECK_REQUIRED');
     if (issueItems.length > 0) {
       reportLines.push(`### ⚠️ 수집 정보 보완 필요 상품 요약`);
       issueItems.forEach((item, index) => {
+        const cat = (item as any).category || '일반/기타';
         const missingStr = item.missingRequiredFields && item.missingRequiredFields.length > 0
           ? item.missingRequiredFields.join(', ')
-          : '확인 불가';
-        reportLines.push(`${index + 1}. **${item.productName || '상품명 미식별'}**`);
-        reportLines.push(`   - **상태**: ${item.status === 'INSUFFICIENT' ? '정보 부족 (보완 필요)' : '확인 필요 (검수 필요)'}`);
-        reportLines.push(`   - **누락된 필수 항목**: \`${missingStr}\``);
+          : '핵심 필드 3개 미만 충족 등';
+        const excludedStr = (item as any).irrelevantExcluded && (item as any).irrelevantExcluded.length > 0
+          ? (item as any).irrelevantExcluded.join(', ')
+          : '없음';
+
+        reportLines.push(`${index + 1}. **${item.productName || '상품명 미식별'}** \`[${cat}]\``);
+        reportLines.push(`   - **상태**: ${item.status === 'INSUFFICIENT' ? '정보 부족 (부분 답변 가능)' : '확인 필요 (판매자 검수 요망)'}`);
+        reportLines.push(`   - **실제 부족한 핵심 필드**: \`${missingStr}\``);
+        reportLines.push(`   - **상품군과 무관하여 제외된 항목**: \`${excludedStr}\``);
         reportLines.push(`   - **상세 사유**: ${item.reason}`);
       });
       reportLines.push(``);

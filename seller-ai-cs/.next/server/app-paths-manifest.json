@@ -1,4 +1,6 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/page": "app/page.js"
+  "/api/analyze-catalog/route": "app/api/analyze-catalog/route.js",
+  "/page": "app/page.js",
+  "/api/analyze-url/route": "app/api/analyze-url/route.js",
+  "/api/analyze-catalog/status/route": "app/api/analyze-catalog/status/route.js"
 }
